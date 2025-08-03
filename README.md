@@ -1,6 +1,6 @@
 # BOSS - Business OS plus Simulations
 
-[![BOSS Version](https://img.shields.io/badge/BOSS-v8.10.1-blue.svg)](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
+[![BOSS Version](https://img.shields.io/github/v/release/risa-labs-inc/BOSS-Releases.svg?label=BOSS&color=blue)](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-blue.svg)](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](https://github.com/risa-labs-inc/BOSS-Releases/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/github/downloads/risa-labs-inc/BOSS-Releases/total.svg)](https://github.com/risa-labs-inc/BOSS-Releases/releases)
@@ -9,13 +9,13 @@ BOSS (Business OS plus Simulations) is a sophisticated, AI-powered workspace des
 
 ## 🚀 Latest Release
 
-| Platform | Version | Release Date | Download |
-|----------|---------|--------------|----------|
-| **macOS** | v8.10.1 | 2025-08-03 | [Download DMG](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1-Universal.dmg) |
-| **Windows** | v8.10.1 | 2025-08-03 | [Download MSI](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1.msi) |
-| **Linux (DEB)** | v8.10.1 | 2025-08-03 | [Download DEB](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1.deb) |
-| **Linux (RPM)** | v8.10.1 | 2025-08-03 | [Download RPM](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1.rpm) |
-| **Linux (JAR)** | v8.10.1 | 2025-08-03 | [Download JAR](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1.jar) |
+| Platform | Download |
+|----------|----------|
+| **macOS (Universal)** | [Download DMG](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
+| **Windows (x64)** | [Download MSI](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
+| **Linux (DEB)** | [Download DEB](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
+| **Linux (RPM)** | [Download RPM](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
+| **Linux (JAR)** | [Download JAR](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 
 ## 📋 What is BOSS?
 
@@ -109,9 +109,11 @@ BOSS includes optimized layouts for different roles:
 
 #### Ubuntu/Debian (DEB Package)
 ```bash
-# Download and install
-wget https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1.deb
-sudo dpkg -i BOSS-8.10.1.deb
+# Download latest DEB package
+wget $(curl -s https://api.github.com/repos/risa-labs-inc/BOSS-Releases/releases/latest | grep "browser_download_url.*\.deb" | cut -d '"' -f 4)
+
+# Install
+sudo dpkg -i BOSS-*.deb
 sudo apt-get install -f  # Fix any missing dependencies
 
 # Launch
@@ -120,10 +122,12 @@ boss
 
 #### RHEL/Fedora/openSUSE (RPM Package)
 ```bash
-# Download and install
-wget https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1.rpm
-sudo rpm -i BOSS-8.10.1.rpm
-# OR for Fedora: sudo dnf install BOSS-8.10.1.rpm
+# Download latest RPM package
+wget $(curl -s https://api.github.com/repos/risa-labs-inc/BOSS-Releases/releases/latest | grep "browser_download_url.*\.rpm" | cut -d '"' -f 4)
+
+# Install
+sudo rpm -i BOSS-*.rpm
+# OR for Fedora: sudo dnf install BOSS-*.rpm
 
 # Launch
 boss
@@ -134,9 +138,9 @@ boss
 # Ensure Java 17+ is installed
 java -version
 
-# Download and run
-wget https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1.jar
-java -jar BOSS-8.10.1.jar
+# Download and run latest JAR
+wget $(curl -s https://api.github.com/repos/risa-labs-inc/BOSS-Releases/releases/latest | grep "browser_download_url.*\.jar" | cut -d '"' -f 4)
+java -jar BOSS-*.jar
 ```
 
 ## 🔄 Auto-Update
