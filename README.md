@@ -17,7 +17,7 @@ BOSS (Business OS plus Simulations) is a sophisticated, AI-powered workspace des
 | **Linux (RPM)** | [📦 Download RPM](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 | **Linux (JAR)** | [📦 Download JAR](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 
-> 💡 **Quick Install**: `brew install risa-labs-inc/boss` (macOS) or click any link above for direct downloads.
+> 💡 **Quick Install**: `brew install --cask risa-labs-inc/risa-labs-inc/boss` (macOS) or click any link above for direct downloads.
 
 ## 📋 What is BOSS?
 
@@ -102,7 +102,7 @@ BOSS includes optimized layouts for different roles:
 #### Option 1: Homebrew (Recommended)
 ```bash
 # Quick install
-brew install risa-labs-inc/boss
+brew install --cask risa-labs-inc/risa-labs-inc/boss
 
 # Or add tap first, then install
 brew tap risa-labs-inc/risa-labs-inc
