@@ -30,15 +30,28 @@ if [ "$EUID" -ne 0 ]; then
     fi
 fi
 
+# Detect architecture
+ARCH=$(dpkg --print-architecture)
+
 # Add repository to sources.list.d
 REPO_FILE="/etc/apt/sources.list.d/boss.list"
 echo "📝 Adding BOSS repository to $REPO_FILE..."
 
-cat > "$REPO_FILE" << EOF
+if [ "$ARCH" = "amd64" ]; then
+    cat > "$REPO_FILE" << EOF
 # BOSS - Business OS plus Simulations
 # Official APT repository
-deb [trusted=yes] https://github.com/risa-labs-inc/BOSS-Releases/raw/main/apt stable main
+deb [trusted=yes arch=amd64] https://github.com/risa-labs-inc/BOSS-Releases/raw/main/apt stable main
 EOF
+elif [ "$ARCH" = "arm64" ]; then
+    echo -e "${RED}Error: BOSS is currently only available for amd64 (x86_64) architecture${NC}"
+    echo "ARM64 support is not yet available."
+    exit 1
+else
+    echo -e "${RED}Error: Unsupported architecture: $ARCH${NC}"
+    echo "BOSS is only available for amd64 (x86_64) architecture."
+    exit 1
+fi
 
 echo -e "${GREEN}✅ Repository added${NC}"
 

@@ -7,3 +7,9 @@ Architectures: amd64
 Components: main
 Description: BOSS - Business OS plus Simulations APT Repository
 Date: Sat, 03 Aug 2025 04:30:00 +0000
+MD5Sum:
+ 4f1263eb69faa399c8cfa58e3df51a4b 757 main/binary-amd64/Packages
+ 58f44b7befc0958b1685a9d35268312f 521 main/binary-amd64/Packages.gz
+SHA256:
+ 84ba536f293d43cb55ce4b45016ecc625388ea510aa72cbe1da9c7574c080621 757 main/binary-amd64/Packages
+ 770b3811d541d6606ec9b2fb5e11ac862d0dbf6f0e49111e92022c6578666045 521 main/binary-amd64/Packages.gz

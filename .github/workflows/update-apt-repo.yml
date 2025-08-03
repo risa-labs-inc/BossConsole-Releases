@@ -59,20 +59,20 @@ jobs:
           Date: $(date -Ru)
           EOF
           
-          # Add checksums
+          # Add checksums with proper formatting
           echo "MD5Sum:" >> dists/stable/Release
-          find dists/stable/main -type f -name "Packages*" | while read file; do
+          (cd dists/stable && find main -type f -name "Packages*" | while read file; do
               SIZE=$(stat -c%s "$file")
               MD5=$(md5sum "$file" | cut -d' ' -f1)
-              echo " $MD5 $SIZE ${file#dists/stable/}" >> dists/stable/Release
-          done
+              echo " $MD5 $SIZE $file" >> Release
+          done)
           
           echo "SHA256:" >> dists/stable/Release
-          find dists/stable/main -type f -name "Packages*" | while read file; do
+          (cd dists/stable && find main -type f -name "Packages*" | while read file; do
               SIZE=$(stat -c%s "$file")
               SHA256=$(sha256sum "$file" | cut -d' ' -f1)
-              echo " $SHA256 $SIZE ${file#dists/stable/}" >> dists/stable/Release
-          done
+              echo " $SHA256 $SIZE $file" >> Release
+          done)
           
       - name: Commit and push changes
         run: |
