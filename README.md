@@ -184,22 +184,15 @@ See our [Security Policy](SECURITY.md) for detailed information.
 
 ## 📊 Release History
 
-### **v8.10.1** - 2025-08-03
-- Performance improvements and bug fixes
-- Enhanced RPA engine stability
-- Updated AI model integrations
+BOSS follows semantic versioning with regular updates including new features, performance improvements, and security patches. Each release includes:
 
-### **v8.10.0** - 2025-08-02
-- New EHR Explorer module
-- Enhanced workflow automation
-- Improved configuration management
+- **Performance Enhancements**: Continuous optimization for better speed and efficiency
+- **New Features**: Regular addition of AI capabilities and workflow improvements  
+- **Security Updates**: Proactive security patches and vulnerability fixes
+- **UI/UX Improvements**: Enhanced user experience and interface refinements
+- **Bug Fixes**: Resolution of reported issues and stability improvements
 
-### **v8.9.8** - 2025-07-29
-- Security updates and patches
-- UI/UX improvements
-- Better error handling
-
-[View all releases →](https://github.com/risa-labs-inc/BOSS-Releases/releases)
+[View detailed release history and download previous versions →](https://github.com/risa-labs-inc/BOSS-Releases/releases)
 
 ## 🏢 About Risa Labs
 

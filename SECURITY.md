@@ -10,10 +10,10 @@ We actively maintain and provide security updates for the following versions of 
 
 | Version | Supported          | End of Support |
 | ------- | ------------------ | -------------- |
-| 8.10.x  | ✅ Active          | TBD            |
-| 8.9.x   | ✅ Active          | TBD            |
-| 8.8.x   | ⚠️ Limited Support | 2025-12-31     |
-| < 8.8   | ❌ No Support      | N/A            |
+| Latest  | ✅ Active          | N/A            |
+| Previous Major | ✅ Active          | TBD            |
+| Legacy  | ⚠️ Limited Support | 12 months      |
+| EOL     | ❌ No Support      | N/A            |
 
 ### Support Levels
 - **✅ Active**: Full security updates, bug fixes, and feature updates
@@ -42,7 +42,7 @@ Please include the following information in your report:
 ```
 Vulnerability Report Template:
 
-1. BOSS Version: (e.g., v8.10.1)
+1. BOSS Version: (e.g., latest version)
 2. Platform: (macOS/Windows/Linux)
 3. Vulnerability Type: (e.g., Code Injection, Data Exposure, Authentication Bypass)
 4. Severity Assessment: (Critical/High/Medium/Low)
@@ -152,9 +152,9 @@ Given BOSS's healthcare focus, we maintain additional security standards:
 #### Installation Security
 ```bash
 # Verify downloaded file integrity (example for macOS)
-shasum -a 256 BOSS-8.10.1-Universal.dmg
+shasum -a 256 BOSS-*-Universal.dmg
 
-# Expected checksum will be provided with release
+# Expected checksum will be provided with each release
 ```
 
 #### Runtime Security Configuration
@@ -183,22 +183,18 @@ shasum -a 256 BOSS-8.10.1-Universal.dmg
 
 ## 📜 Security Changelog
 
-### v8.10.1 - 2025-08-03
-- Enhanced RPA sandbox security
-- Updated TLS certificate validation
-- Improved memory protection mechanisms
+BOSS security updates are released regularly with each version. Recent security improvements include:
 
-### v8.10.0 - 2025-08-02
-- New encrypted configuration system
-- Enhanced API key protection
-- Improved audit logging
+- **Enhanced RPA Sandbox Security**: Improved isolation for browser automation
+- **Updated TLS Certificate Validation**: Stronger certificate verification processes
+- **Memory Protection Mechanisms**: Advanced memory safety implementations
+- **Encrypted Configuration System**: Enhanced protection for sensitive settings
+- **API Key Protection**: Improved secure storage and transmission
+- **Audit Logging**: Comprehensive security event tracking
+- **Dependency Updates**: Regular patching of third-party vulnerabilities
+- **Input Validation**: Enhanced protection against injection attacks
 
-### v8.9.8 - 2025-07-29
-- Critical security patches applied
-- Updated dependency vulnerabilities
-- Enhanced input validation
-
-[View detailed security changelog →](https://github.com/risa-labs-inc/BOSS-Releases/releases)
+[View detailed security changelog with version history →](https://github.com/risa-labs-inc/BOSS-Releases/releases)
 
 ## 🏆 Security Recognition
 
@@ -212,8 +208,8 @@ We acknowledge and appreciate security researchers who help improve BOSS securit
 
 ---
 
-**Last Updated**: August 3, 2025  
-**Security Policy Version**: 1.0
+**Security Policy Version**: 1.0  
+**Last Updated**: Maintained with each release
 
 For additional security questions or concerns, please contact our security team at [security@risalabs.ai](mailto:security@risalabs.ai).
 
