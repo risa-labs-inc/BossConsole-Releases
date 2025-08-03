@@ -32,26 +32,35 @@ fi
 
 # Detect architecture
 ARCH=$(dpkg --print-architecture)
+echo "🔍 Detected architecture: $ARCH"
+
+# Check architecture before proceeding
+if [ "$ARCH" != "amd64" ]; then
+    if [ "$ARCH" = "arm64" ]; then
+        echo -e "${RED}Error: BOSS is currently only available for amd64 (x86_64) architecture${NC}"
+        echo ""
+        echo "You are running on ARM64 architecture (Apple Silicon or ARM processor)."
+        echo "BOSS does not yet support ARM64, but support may be added in the future."
+        echo ""
+        echo "Workarounds:"
+        echo "1. Use an x86_64 virtual machine or container"
+        echo "2. Use the JAR version with Java (if available for ARM64)"
+    else
+        echo -e "${RED}Error: Unsupported architecture: $ARCH${NC}"
+        echo "BOSS is only available for amd64 (x86_64) architecture."
+    fi
+    exit 1
+fi
 
 # Add repository to sources.list.d
 REPO_FILE="/etc/apt/sources.list.d/boss.list"
 echo "📝 Adding BOSS repository to $REPO_FILE..."
 
-if [ "$ARCH" = "amd64" ]; then
-    cat > "$REPO_FILE" << EOF
+cat > "$REPO_FILE" << EOF
 # BOSS - Business OS plus Simulations
 # Official APT repository
 deb [trusted=yes arch=amd64] https://github.com/risa-labs-inc/BOSS-Releases/raw/main/apt stable main
 EOF
-elif [ "$ARCH" = "arm64" ]; then
-    echo -e "${RED}Error: BOSS is currently only available for amd64 (x86_64) architecture${NC}"
-    echo "ARM64 support is not yet available."
-    exit 1
-else
-    echo -e "${RED}Error: Unsupported architecture: $ARCH${NC}"
-    echo "BOSS is only available for amd64 (x86_64) architecture."
-    exit 1
-fi
 
 echo -e "${GREEN}✅ Repository added${NC}"
 
