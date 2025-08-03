@@ -14,7 +14,9 @@ BOSS (Business OS plus Simulations) is a sophisticated, AI-powered workspace des
 |----------|---------|--------------|----------|
 | **macOS** | v8.10.1 | 2025-08-03 | [Download DMG](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1-Universal.dmg) |
 | **Windows** | v8.10.1 | 2025-08-03 | [Download MSI](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1.msi) |
-| **Linux** | v8.10.1 | 2025-08-03 | [Download JAR](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1-all.jar) |
+| **Linux (DEB)** | v8.10.1 | 2025-08-03 | [Download DEB](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1.deb) |
+| **Linux (RPM)** | v8.10.1 | 2025-08-03 | [Download RPM](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1.rpm) |
+| **Linux (JAR)** | v8.10.1 | 2025-08-03 | [Download JAR](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1.jar) |
 
 ## 📋 What is BOSS?
 
@@ -85,8 +87,10 @@ BOSS includes optimized layouts for different roles:
 - **Runtime**: Java 17+ (bundled with installer)
 
 ### Linux
-- **OS**: Ubuntu 18.04+ / CentOS 7+ / RHEL 7+ or equivalent
-- **Runtime**: Java 17+ required
+- **DEB Package**: Ubuntu 18.04+ / Debian 10+ / Linux Mint 19+
+- **RPM Package**: RHEL 8+ / Fedora 30+ / openSUSE 15+ / CentOS 8+
+- **JAR Package**: Any Linux distribution with Java 17+
+- **Architecture**: x86_64 (64-bit)
 - **Memory**: 4 GB RAM minimum, 8 GB recommended
 - **Storage**: 500 MB available space
 
@@ -102,10 +106,39 @@ BOSS includes optimized layouts for different roles:
 2. Run the installer with administrator privileges
 3. Launch BOSS from Start Menu or Desktop shortcut
 
-### Linux (JAR)
-1. Ensure Java 17+ is installed: `java -version`
-2. Download the JAR file from [Releases](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
-3. Run: `java -jar BOSS-8.10.1-all.jar`
+### Linux
+
+#### Ubuntu/Debian (DEB Package)
+```bash
+# Download and install
+wget https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1.deb
+sudo dpkg -i BOSS-8.10.1.deb
+sudo apt-get install -f  # Fix any missing dependencies
+
+# Launch
+boss
+```
+
+#### RHEL/Fedora/openSUSE (RPM Package)
+```bash
+# Download and install
+wget https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1.rpm
+sudo rpm -i BOSS-8.10.1.rpm
+# OR for Fedora: sudo dnf install BOSS-8.10.1.rpm
+
+# Launch
+boss
+```
+
+#### Universal Linux (JAR)
+```bash
+# Ensure Java 17+ is installed
+java -version
+
+# Download and run
+wget https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1.jar
+java -jar BOSS-8.10.1.jar
+```
 
 ## 🔄 Auto-Update
 
