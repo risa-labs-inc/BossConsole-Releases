@@ -16,17 +16,31 @@ This directory contains GitHub Actions workflows that automatically update Homeb
 
 ## Setup Instructions
 
-### Setting up `HOMEBREW_TAP_TOKEN`
+### Setting up `HOMEBREW_TAP_TOKEN` (Secure Method)
 
-1. Go to https://github.com/settings/tokens/new
-2. Create a new token with these permissions:
-   - `repo` (Full control of private repositories)
-   - Name it something like "BOSS Homebrew Tap Updater"
-3. Copy the token
-4. Go to https://github.com/risa-labs-inc/BOSS-Releases/settings/secrets/actions
-5. Click "New repository secret"
-6. Name: `HOMEBREW_TAP_TOKEN`
-7. Value: Paste the token you copied
+**Recommended: Use Fine-grained Personal Access Token**
+
+1. Go to https://github.com/settings/personal-access-tokens/new
+2. Configure the token:
+   - **Token name**: "BOSS Homebrew Tap Updater"
+   - **Expiration**: 90 days (rotate regularly)
+   - **Repository access**: Select only `risa-labs-inc/homebrew`
+   - **Permissions**: 
+     - Repository permissions → Contents: Write
+     - Repository permissions → Metadata: Read (automatically selected)
+3. Click "Generate token" and copy it
+4. Add to BOSS-Releases:
+   - Go to https://github.com/risa-labs-inc/BOSS-Releases/settings/secrets/actions
+   - Click "New repository secret"
+   - Name: `HOMEBREW_TAP_TOKEN`
+   - Value: Paste the token
+   - Click "Add secret"
+
+**Security Notes**:
+- This token can ONLY modify the homebrew repository
+- It cannot access any other repositories
+- Set a calendar reminder to rotate it before expiration
+- The token is encrypted and never exposed in logs
 
 ### Setting up `HOMEBREW_CASK_TOKEN` (Optional, for official Homebrew PR)
 
