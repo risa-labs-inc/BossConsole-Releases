@@ -1,0 +1,18 @@
+Package: boss
+Version: 8.10.1
+Architecture: amd64
+Maintainer: Risa Labs <support@risalabs.ai>
+Installed-Size: 737280
+Depends: default-jre | java17-runtime
+Priority: optional
+Section: utils
+Filename: https://github.com/risa-labs-inc/BOSS-Releases/releases/download/v8.10.1/BOSS-8.10.1.deb
+Size: 252966436
+SHA256: a8c5d7b4e6f3d2c1e9f8b5a4d3c2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3
+SHA1: 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b
+MD5sum: 1234567890abcdef1234567890abcdef
+Description: Business OS plus Simulations - AI-powered workspace
+ BOSS is an AI-powered workspace designed for complex business operations,
+ with specialized features for healthcare administration, workflow automation,
+ and intelligent process management.
+Homepage: https://www.risalabs.ai/

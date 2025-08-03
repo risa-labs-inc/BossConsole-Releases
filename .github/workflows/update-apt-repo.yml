@@ -1,0 +1,89 @@
+name: Update APT Repository
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  update-apt:
+    name: Update APT Repository
+    runs-on: ubuntu-latest
+    if: "!github.event.release.prerelease"
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev
+          
+      - name: Download DEB package
+        run: |
+          # Extract version from release tag
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          
+          # Download the .deb file
+          echo "📦 Downloading BOSS-${VERSION}.deb..."
+          curl -L "https://github.com/risa-labs-inc/BOSS-Releases/releases/download/v${VERSION}/BOSS-${VERSION}.deb" \
+               -o "BOSS-${VERSION}.deb"
+          
+      - name: Update APT repository
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          
+          # Move .deb to pool
+          mkdir -p apt/pool/main/b/boss
+          mv "BOSS-${VERSION}.deb" apt/pool/main/b/boss/
+          
+          # Generate Packages file
+          cd apt
+          mkdir -p dists/stable/main/binary-amd64
+          dpkg-scanpackages pool/main > dists/stable/main/binary-amd64/Packages
+          gzip -9c dists/stable/main/binary-amd64/Packages > dists/stable/main/binary-amd64/Packages.gz
+          
+          # Create Release file
+          cat > dists/stable/Release << EOF
+          Origin: Risa Labs
+          Label: BOSS
+          Suite: stable
+          Codename: stable
+          Version: 1.0
+          Architectures: amd64
+          Components: main
+          Description: BOSS - Business OS plus Simulations APT Repository
+          Date: $(date -Ru)
+          EOF
+          
+          # Add checksums
+          echo "MD5Sum:" >> dists/stable/Release
+          find dists/stable/main -type f -name "Packages*" | while read file; do
+              SIZE=$(stat -c%s "$file")
+              MD5=$(md5sum "$file" | cut -d' ' -f1)
+              echo " $MD5 $SIZE ${file#dists/stable/}" >> dists/stable/Release
+          done
+          
+          echo "SHA256:" >> dists/stable/Release
+          find dists/stable/main -type f -name "Packages*" | while read file; do
+              SIZE=$(stat -c%s "$file")
+              SHA256=$(sha256sum "$file" | cut -d' ' -f1)
+              echo " $SHA256 $SIZE ${file#dists/stable/}" >> dists/stable/Release
+          done
+          
+      - name: Commit and push changes
+        run: |
+          git config user.name "BOSS Release Bot"
+          git config user.email "noreply@risa-labs.com"
+          
+          git add apt/
+          git commit -m "📦 Update APT repository for BOSS ${{ github.event.release.tag_name }}
+
+          Release: ${{ github.event.release.html_url }}
+          
+          Co-authored-by: ${{ github.event.release.author.login }} <${{ github.event.release.author.id }}+${{ github.event.release.author.login }}@users.noreply.github.com>"
+          
+          git push

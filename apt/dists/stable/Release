@@ -1,0 +1,9 @@
+Origin: Risa Labs
+Label: BOSS
+Suite: stable
+Codename: stable
+Version: 1.0
+Architectures: amd64
+Components: main
+Description: BOSS - Business OS plus Simulations APT Repository
+Date: Sat, 03 Aug 2025 04:30:00 +0000

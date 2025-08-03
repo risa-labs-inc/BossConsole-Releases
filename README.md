@@ -17,7 +17,10 @@ BOSS (Business OS plus Simulations) is a sophisticated, AI-powered workspace des
 | **Linux (RPM)** | [📦 Download RPM](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 | **Linux (JAR)** | [📦 Download JAR](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 
-> 💡 **Quick Install**: `brew tap risa-labs-inc/homebrew && brew install --cask boss` (macOS) or click any link above for direct downloads.
+> 💡 **Quick Install**: 
+> - **macOS**: `brew tap risa-labs-inc/homebrew && brew install --cask boss`
+> - **Ubuntu/Debian**: `curl -fsSL https://raw.githubusercontent.com/risa-labs-inc/BOSS-Releases/main/scripts/add-apt-repo.sh | sudo bash && sudo apt-get install boss`
+> - **Others**: Click any link above for direct downloads
 
 ## 📋 What is BOSS?
 
@@ -119,6 +122,20 @@ brew install --cask boss
 ### Linux
 
 #### Ubuntu/Debian (DEB Package)
+
+**Option 1: APT Repository (Recommended)**
+```bash
+# Add BOSS repository
+curl -fsSL https://raw.githubusercontent.com/risa-labs-inc/BOSS-Releases/main/scripts/add-apt-repo.sh | sudo bash
+
+# Install BOSS
+sudo apt-get install boss
+
+# Launch
+boss
+```
+
+**Option 2: Direct Download**
 ```bash
 # Download latest DEB package
 wget $(curl -s https://api.github.com/repos/risa-labs-inc/BOSS-Releases/releases/latest | grep "browser_download_url.*\.deb" | cut -d '"' -f 4)
