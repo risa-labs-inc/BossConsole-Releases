@@ -1,0 +1,57 @@
+BOSS - Business OS plus Simulations
+Copyright (c) 2025 Risa Labs Inc. All rights reserved.
+
+PROPRIETARY SOFTWARE LICENSE
+
+This software and associated documentation files (the "Software") are proprietary 
+to Risa Labs Inc. ("Licensor"). The Software is protected by copyright laws and 
+international copyright treaties, as well as other intellectual property laws and 
+treaties.
+
+PERMITTED USES:
+- You may install and use the Software on devices you own or control
+- You may make backup copies of the Software for archival purposes
+- You may use the Software in accordance with the applicable End User License Agreement
+
+RESTRICTIONS:
+- You may NOT distribute, sublicense, rent, lease, or sell the Software
+- You may NOT reverse engineer, decompile, or disassemble the Software
+- You may NOT modify, adapt, or create derivative works based on the Software
+- You may NOT remove or alter any proprietary notices or labels on the Software
+
+HEALTHCARE DATA COMPLIANCE:
+When processing healthcare or personally identifiable information, you agree to:
+- Comply with applicable healthcare regulations including HIPAA, HITECH, and GDPR
+- Implement appropriate safeguards for protected health information
+- Ensure proper access controls and audit logging
+- Report security incidents as required by applicable law
+
+DISCLAIMER OF WARRANTIES:
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL RISA LABS INC. BE LIABLE 
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT 
+OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
+OR OTHER DEALINGS IN THE SOFTWARE.
+
+LIMITATION OF LIABILITY:
+IN NO EVENT SHALL RISA LABS INC. BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, 
+OR CONSEQUENTIAL DAMAGES WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR 
+LOSS OF BUSINESS PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR 
+ANY OTHER PECUNIARY LOSS) ARISING OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE, 
+EVEN IF RISA LABS INC. HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+GOVERNING LAW:
+This license shall be governed by and construed in accordance with the laws of the 
+jurisdiction in which Risa Labs Inc. is incorporated, without regard to its conflict 
+of law provisions.
+
+CONTACT INFORMATION:
+For licensing inquiries: enterprise@risalabs.ai
+For support: support@risalabs.ai
+For security issues: security@risalabs.ai
+
+Risa Labs Inc.
+Website: https://www.risalabs.ai
+
+Last Updated: August 3, 2025

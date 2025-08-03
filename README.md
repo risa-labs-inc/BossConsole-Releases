@@ -1,12 +1,12 @@
-# BOSS - Business Operations Support System
+# BOSS - Business OS plus Simulations
 
 ![BOSS Version](https://img.shields.io/badge/BOSS-v8.10.1-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)
 ![License](https://img.shields.io/badge/license-Proprietary-red.svg)
 
-BOSS (Business Operations Support System) is a sophisticated, AI-powered workspace designed for complex business operations, with specialized features for healthcare administration, workflow automation, and intelligent process management.
+BOSS (Business OS plus Simulations) is a sophisticated, AI-powered workspace designed for complex business operations, with specialized features for healthcare administration, workflow automation, and intelligent process management.
 
-## =€ Latest Release
+## =ï¿½ Latest Release
 
 | Platform | Version | Release Date | Download |
 |----------|---------|--------------|----------|
@@ -14,18 +14,18 @@ BOSS (Business Operations Support System) is a sophisticated, AI-powered workspa
 | **Windows** | v8.10.1 | 2025-08-03 | [Download MSI](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1.msi) |
 | **Linux** | v8.10.1 | 2025-08-03 | [Download JAR](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest/download/BOSS-8.10.1-all.jar) |
 
-## =Ë What is BOSS?
+## =ï¿½ What is BOSS?
 
 BOSS is an integrated workspace that combines **AI automation**, **configurable layouts**, and **intelligent workflow management** into a unified platform. It's designed for organizations that need:
 
-- <å **Healthcare Operations**: Prior authorization, patient triage, EHR management
+- <ï¿½ **Healthcare Operations**: Prior authorization, patient triage, EHR management
 - > **AI-Powered Automation**: LLM integration with robotic process automation
-- ™ **Workflow Optimization**: Configurable workspaces for different business roles
+- ï¿½ **Workflow Optimization**: Configurable workspaces for different business roles
 - = **System Integration**: Unified interface for multiple tools and data sources
 
 ## ( Key Features
 
-### <× Modular Workspace Architecture
+### <ï¿½ Modular Workspace Architecture
 - **Configurable Panels**: Customizable layout with specialized components
 - **Multi-Tab Browser**: Integrated web browsing with automation capabilities  
 - **Code Editor**: Built-in development environment
@@ -37,7 +37,7 @@ BOSS is an integrated workspace that combines **AI automation**, **configurable 
 - **Browser Automation**: Automated web-based task execution
 - **Intelligent Routing**: Context-aware workflow optimization
 
-### =Ê Specialized Modules
+### =ï¿½ Specialized Modules
 - **EHR Explorer**: Electronic Health Records navigation and analysis
 - **System of Records**: Centralized data source management
 - **Task Resolver**: Registry for workflow resolution patterns
@@ -49,7 +49,7 @@ BOSS is an integrated workspace that combines **AI automation**, **configurable 
 - **Version Control Integration**: Built-in Git support
 - **Cross-Platform Support**: macOS, Windows, Linux compatibility
 
-## <å Healthcare Focus
+## <ï¿½ Healthcare Focus
 
 BOSS excels in healthcare administrative workflows:
 
@@ -59,16 +59,16 @@ BOSS excels in healthcare administrative workflows:
 - **Surgery Coordination**: EV/BV procedure management and scheduling
 - **Compliance Management**: Regulatory workflow automation
 
-## <¯ Preconfigured Workspaces
+## <ï¿½ Preconfigured Workspaces
 
 BOSS includes optimized layouts for different roles:
 
-- **<å PriorAuth**: PA Dashboard, OncoEMR, CoverMyMeds integration
-- **<¨ Designer**: Figma, Canva, Notion workspace
-- **=» Coder**: GitHub, Terminal, Stack Overflow environment
-- **=ç Mail**: Gmail, LinkedIn, Twitter communication hub
+- **<ï¿½ PriorAuth**: PA Dashboard, OncoEMR, CoverMyMeds integration
+- **<ï¿½ Designer**: Figma, Canva, Notion workspace
+- **=ï¿½ Coder**: GitHub, Terminal, Stack Overflow environment
+- **=ï¿½ Mail**: Gmail, LinkedIn, Twitter communication hub
 
-## =» System Requirements
+## =ï¿½ System Requirements
 
 ### macOS
 - **OS**: macOS 11.0 (Big Sur) or later
@@ -88,12 +88,12 @@ BOSS includes optimized layouts for different roles:
 - **Memory**: 4 GB RAM minimum, 8 GB recommended
 - **Storage**: 500 MB available space
 
-## =å Installation
+## =ï¿½ Installation
 
 ### macOS (DMG)
 1. Download the latest DMG file from [Releases](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
 2. Mount the DMG and drag BOSS to Applications
-3. Right-click BOSS ’ Open to bypass Gatekeeper (first launch only)
+3. Right-click BOSS ï¿½ Open to bypass Gatekeeper (first launch only)
 
 ### Windows (MSI)
 1. Download the latest MSI installer from [Releases](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
@@ -113,7 +113,7 @@ BOSS includes an intelligent auto-update system:
 - **Staged Installation**: Applies updates on next restart
 - **Rollback Support**: Easy reversion if issues occur
 
-## =à Configuration
+## =ï¿½ Configuration
 
 ### First Launch
 1. **Workspace Selection**: Choose from preconfigured layouts or create custom
@@ -127,7 +127,7 @@ BOSS includes an intelligent auto-update system:
 - **Keyboard Shortcuts**: Customize hotkeys for efficiency
 - **Profile Export**: Save and share workspace configurations
 
-## <˜ Support & Documentation
+## <ï¿½ Support & Documentation
 
 - **Issues**: Report bugs and feature requests in this repository
 - **Community**: Join discussions in GitHub Discussions
@@ -144,7 +144,7 @@ BOSS takes security seriously:
 
 See our [Security Policy](SECURITY.md) for detailed information.
 
-## =Ê Release History
+## =ï¿½ Release History
 
 ### **v8.10.1** - 2025-08-03
 - Performance improvements and bug fixes
@@ -161,14 +161,14 @@ See our [Security Policy](SECURITY.md) for detailed information.
 - UI/UX improvements
 - Better error handling
 
-[View all releases ’](https://github.com/risa-labs-inc/BOSS-Releases/releases)
+[View all releases ï¿½](https://github.com/risa-labs-inc/BOSS-Releases/releases)
 
-## <â About Risa Labs
+## <ï¿½ About Risa Labs
 
 BOSS is developed by [Risa Labs](https://www.risalabs.ai), a company focused on building intelligent automation solutions for complex business operations.
 
 ---
 
-**© 2025 Risa Labs Inc. All rights reserved.**
+**ï¿½ 2025 Risa Labs Inc. All rights reserved.**
 
 For enterprise licensing and custom deployments, contact [enterprise@risalabs.ai](mailto:enterprise@risalabs.ai)
