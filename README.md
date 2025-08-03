@@ -11,13 +11,13 @@ BOSS (Business OS plus Simulations) is a sophisticated, AI-powered workspace des
 
 | Platform | Download |
 |----------|----------|
-| **macOS (Universal)** | [📦 Download DMG](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
+| **macOS (Universal)** | [🍺 Homebrew](https://github.com/risa-labs-inc/homebrew-risa-labs-inc) \| [📦 Download DMG](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 | **Windows (x64)** | [📦 Download MSI](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 | **Linux (DEB)** | [📦 Download DEB](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 | **Linux (RPM)** | [📦 Download RPM](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 | **Linux (JAR)** | [📦 Download JAR](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 
-> 💡 **All Downloads**: Click any link above to access the latest release page with all download options.
+> 💡 **Quick Install**: `brew install risa-labs-inc/risa-labs-inc/boss` (macOS) or click any link above for direct downloads.
 
 ## 📋 What is BOSS?
 
@@ -97,7 +97,19 @@ BOSS includes optimized layouts for different roles:
 
 ## 📥 Installation
 
-### macOS (DMG)
+### macOS
+
+#### Option 1: Homebrew (Recommended)
+```bash
+# Quick install
+brew install risa-labs-inc/risa-labs-inc/boss
+
+# Or add tap first, then install
+brew tap risa-labs-inc/risa-labs-inc
+brew install --cask boss
+```
+
+#### Option 2: Direct Download (DMG)
 1. Download the latest DMG file from [Releases](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
 2. Mount the DMG and drag BOSS to Applications
 3. Launch BOSS from Applications folder
