@@ -99,7 +99,7 @@ BOSS includes optimized layouts for different roles:
 ### macOS (DMG)
 1. Download the latest DMG file from [Releases](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
 2. Mount the DMG and drag BOSS to Applications
-3. Right-click BOSS → Open to bypass Gatekeeper (first launch only)
+3. Launch BOSS from Applications folder
 
 ### Windows (MSI)
 1. Download the latest MSI installer from [Releases](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
