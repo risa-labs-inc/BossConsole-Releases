@@ -11,11 +11,13 @@ BOSS (Business OS plus Simulations) is a sophisticated, AI-powered workspace des
 
 | Platform | Download |
 |----------|----------|
-| **macOS (Universal)** | [Download DMG](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
-| **Windows (x64)** | [Download MSI](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
-| **Linux (DEB)** | [Download DEB](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
-| **Linux (RPM)** | [Download RPM](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
-| **Linux (JAR)** | [Download JAR](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
+| **macOS (Universal)** | [📦 Download DMG](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
+| **Windows (x64)** | [📦 Download MSI](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
+| **Linux (DEB)** | [📦 Download DEB](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
+| **Linux (RPM)** | [📦 Download RPM](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
+| **Linux (JAR)** | [📦 Download JAR](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
+
+> 💡 **All Downloads**: Click any link above to access the latest release page with all download options.
 
 ## 📋 What is BOSS?
 
