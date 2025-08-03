@@ -1,7 +1,7 @@
 # BOSS - Business OS plus Simulations
 
 [![BOSS Version](https://img.shields.io/github/v/release/risa-labs-inc/BOSS-Releases.svg?label=BOSS&color=blue)](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
-[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-blue.svg)](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-brightgreen.svg)](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](https://github.com/risa-labs-inc/BOSS-Releases/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/github/downloads/risa-labs-inc/BOSS-Releases/total.svg)](https://github.com/risa-labs-inc/BOSS-Releases/releases)
 
