@@ -1,8 +1,10 @@
 # BOSS - Business OS plus Simulations
 
-![BOSS Version](https://img.shields.io/badge/BOSS-v8.10.1-blue.svg)
-![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)
-![License](https://img.shields.io/badge/license-Proprietary-red.svg)
+[![BOSS Version](https://img.shields.io/badge/BOSS-v8.10.1-blue.svg)](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
+[![License](https://img.shields.io/badge/license-Proprietary-red.svg)](https://github.com/risa-labs-inc/BOSS-Releases/blob/main/LICENSE)
+[![Downloads](https://img.shields.io/github/downloads/risa-labs-inc/BOSS-Releases/total.svg)](https://github.com/risa-labs-inc/BOSS-Releases/releases)
+[![GitHub Release](https://img.shields.io/github/release/risa-labs-inc/BOSS-Releases.svg)](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
 
 BOSS (Business OS plus Simulations) is a sophisticated, AI-powered workspace designed for complex business operations, with specialized features for healthcare administration, workflow automation, and intelligent process management.
 
