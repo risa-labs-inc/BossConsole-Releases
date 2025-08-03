@@ -1,0 +1,74 @@
+name: Update Homebrew Casks
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-tap:
+    name: Update Custom Homebrew Tap
+    runs-on: ubuntu-latest
+    if: "!github.event.release.prerelease"
+    steps:
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Checkout homebrew tap
+        uses: actions/checkout@v4
+        with:
+          repository: risa-labs-inc/homebrew
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: homebrew
+
+      - name: Update BOSS cask version
+        run: |
+          cd homebrew
+          sed -i 's/version "[^"]*"/version "${{ steps.version.outputs.VERSION }}"/' Casks/boss.rb
+          
+      - name: Commit and push changes
+        run: |
+          cd homebrew
+          git config user.name "BOSS Release Bot"
+          git config user.email "noreply@risa-labs.com"
+          git add Casks/boss.rb
+          git commit -m "🚀 Update BOSS to version ${{ steps.version.outputs.VERSION }}"
+          git push
+
+  update-homebrew-cask:
+    name: Create PR to Homebrew Cask
+    runs-on: macos-latest
+    if: "!github.event.release.prerelease"
+    steps:
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Create PR to homebrew-cask
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_CASK_TOKEN }}
+        run: |
+          # This will create a PR to homebrew/homebrew-cask
+          brew bump-cask-pr boss --version="${{ steps.version.outputs.VERSION }}" --no-browse
+
+  notify:
+    name: Notify on completion
+    runs-on: ubuntu-latest
+    needs: [update-tap, update-homebrew-cask]
+    if: always()
+    steps:
+      - name: Notify success
+        if: ${{ needs.update-tap.result == 'success' && needs.update-homebrew-cask.result == 'success' }}
+        run: |
+          echo "✅ Successfully updated Homebrew casks for BOSS ${{ github.event.release.tag_name }}"
+          echo "- Custom tap: Updated automatically"
+          echo "- Homebrew cask: PR created"
+      
+      - name: Notify failure
+        if: ${{ needs.update-tap.result == 'failure' || needs.update-homebrew-cask.result == 'failure' }}
+        run: |
+          echo "❌ Failed to update Homebrew casks"
+          exit 1
