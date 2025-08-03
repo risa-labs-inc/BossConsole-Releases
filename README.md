@@ -11,13 +11,13 @@ BOSS (Business OS plus Simulations) is a sophisticated, AI-powered workspace des
 
 | Platform | Download |
 |----------|----------|
-| **macOS (Universal)** | [🍺 Homebrew](https://github.com/risa-labs-inc/homebrew-risa-labs-inc) \| [📦 Download DMG](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
+| **macOS (Universal)** | [🍺 Homebrew](https://github.com/risa-labs-inc/homebrew) \| [📦 Download DMG](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 | **Windows (x64)** | [📦 Download MSI](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 | **Linux (DEB)** | [📦 Download DEB](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 | **Linux (RPM)** | [📦 Download RPM](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 | **Linux (JAR)** | [📦 Download JAR](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 
-> 💡 **Quick Install**: `brew tap risa-labs-inc/risa-labs-inc && brew install --cask boss` (macOS) or click any link above for direct downloads.
+> 💡 **Quick Install**: `brew tap risa-labs-inc/homebrew && brew install --cask boss` (macOS) or click any link above for direct downloads.
 
 ## 📋 What is BOSS?
 
@@ -102,7 +102,7 @@ BOSS includes optimized layouts for different roles:
 #### Option 1: Homebrew (Recommended)
 ```bash
 # Add tap and install
-brew tap risa-labs-inc/risa-labs-inc
+brew tap risa-labs-inc/homebrew
 brew install --cask boss
 ```
 
