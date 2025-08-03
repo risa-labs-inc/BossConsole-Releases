@@ -1,26 +1,26 @@
 # Security Policy
 
-## = Security Overview
+## 🔐 Security Overview
 
 Risa Labs takes the security of BOSS (Business OS plus Simulations) seriously. This document outlines our security practices, supported versions, and how to report security vulnerabilities.
 
-## =� Supported Versions
+## 📋 Supported Versions
 
 We actively maintain and provide security updates for the following versions of BOSS:
 
 | Version | Supported          | End of Support |
 | ------- | ------------------ | -------------- |
-| 8.10.x  |  Active          | TBD            |
-| 8.9.x   |  Active          | TBD            |
-| 8.8.x   | � Limited Support | 2025-12-31     |
-| < 8.8   | L No Support      | N/A            |
+| 8.10.x  | ✅ Active          | TBD            |
+| 8.9.x   | ✅ Active          | TBD            |
+| 8.8.x   | ⚠️ Limited Support | 2025-12-31     |
+| < 8.8   | ❌ No Support      | N/A            |
 
 ### Support Levels
-- ** Active**: Full security updates, bug fixes, and feature updates
-- **� Limited Support**: Critical security patches only
-- **L No Support**: No updates provided, upgrade recommended
+- **✅ Active**: Full security updates, bug fixes, and feature updates
+- **⚠️ Limited Support**: Critical security patches only
+- **❌ No Support**: No updates provided, upgrade recommended
 
-## =� Reporting a Vulnerability
+## 🚨 Reporting a Vulnerability
 
 ### Immediate Response Required
 If you discover a **critical security vulnerability** that could pose immediate risk to users:
@@ -33,8 +33,8 @@ If you discover a **critical security vulnerability** that could pose immediate 
 ### Standard Vulnerability Reporting
 For non-critical security issues:
 
-=� **Email**: [security@risalabs.ai](mailto:security@risalabs.ai)  
-<� **Subject**: `BOSS Security Report - [Brief Description]`
+📧 **Email**: [security@risalabs.ai](mailto:security@risalabs.ai)  
+🏷️ **Subject**: `BOSS Security Report - [Brief Description]`
 
 ### Required Information
 Please include the following information in your report:
@@ -62,7 +62,7 @@ Vulnerability Report Template:
 - **High Priority**: Initial response within 72 hours  
 - **Medium/Low Priority**: Initial response within 1 week
 
-## =� Security Measures
+## 🛡️ Security Measures
 
 ### Application Security
 
@@ -117,7 +117,7 @@ Vulnerability Report Template:
 - **Action Logging**: Comprehensive audit trail for RPA activities
 - **Security Headers**: Implementation of CSP and other security headers
 
-## = Security Testing
+## 🔍 Security Testing
 
 ### Internal Security Practices
 - **Static Code Analysis**: Automated scanning with every build
@@ -130,7 +130,7 @@ Vulnerability Report Template:
 - Responsible disclosure program
 - Bug bounty program (contact for details)
 
-## <� Healthcare Security Compliance
+## 🏥 Healthcare Security Compliance
 
 Given BOSS's healthcare focus, we maintain additional security standards:
 
@@ -145,7 +145,7 @@ Given BOSS's healthcare focus, we maintain additional security standards:
 - **NIST Cybersecurity Framework**: Implementation guidelines
 - **Healthcare Information Trust Alliance (HITRUST)**: Security controls
 
-## =' Security Configuration
+## 🔧 Security Configuration
 
 ### Recommended Security Settings
 
@@ -169,7 +169,7 @@ shasum -a 256 BOSS-8.10.1-Universal.dmg
 - Use endpoint protection software
 - Monitor system logs for unusual activity
 
-## =� Security Resources
+## 📚 Security Resources
 
 ### Documentation
 - [BOSS Security Best Practices Guide](mailto:support@risalabs.ai)
@@ -181,7 +181,7 @@ shasum -a 256 BOSS-8.10.1-Universal.dmg
 - **Enterprise Security**: [enterprise@risalabs.ai](mailto:enterprise@risalabs.ai)
 - **Emergency Contact**: [urgent@risalabs.ai](mailto:urgent@risalabs.ai)
 
-## =� Security Changelog
+## 📜 Security Changelog
 
 ### v8.10.1 - 2025-08-03
 - Enhanced RPA sandbox security
@@ -198,9 +198,9 @@ shasum -a 256 BOSS-8.10.1-Universal.dmg
 - Updated dependency vulnerabilities
 - Enhanced input validation
 
-[View detailed security changelog �](https://github.com/risa-labs-inc/BOSS-Releases/releases)
+[View detailed security changelog →](https://github.com/risa-labs-inc/BOSS-Releases/releases)
 
-## <� Security Recognition
+## 🏆 Security Recognition
 
 We acknowledge and appreciate security researchers who help improve BOSS security:
 
@@ -217,4 +217,4 @@ We acknowledge and appreciate security researchers who help improve BOSS securit
 
 For additional security questions or concerns, please contact our security team at [security@risalabs.ai](mailto:security@risalabs.ai).
 
-**� 2025 Risa Labs Inc. All rights reserved.**
+**© 2025 Risa Labs Inc. All rights reserved.**
