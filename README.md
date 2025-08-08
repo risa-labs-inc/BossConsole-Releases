@@ -1,24 +1,24 @@
-# BOSS - Business OS plus Simulations
+# BOSS - Business OS + Simulator
 
 [![BOSS Version](https://img.shields.io/github/v/release/risa-labs-inc/BOSS-Releases.svg?label=BOSS&color=brightgreen)](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-blue.svg)](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](https://github.com/risa-labs-inc/BOSS-Releases/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/github/downloads/risa-labs-inc/BOSS-Releases/total.svg)](https://github.com/risa-labs-inc/BOSS-Releases/releases)
 
-BOSS (Business OS plus Simulations) is a sophisticated, AI-powered workspace designed for complex business operations, with specialized features for healthcare administration, workflow automation, and intelligent process management.
+BOSS (Business OS + Simulator) is a sophisticated, AI-powered workspace designed for complex business operations, with specialized features for healthcare administration, workflow automation, and intelligent process management.
 
 ## 🚀 Latest Release
 
 | Platform | Download |
 |----------|----------|
-| **macOS (Universal)** | [🍺 Homebrew](https://github.com/risa-labs-inc/homebrew) \| [📦 Download DMG](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
+| **macOS (Universal)** | [🍺 Homebrew](https://formulae.brew.sh/cask/boss) \| [📦 Download DMG](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 | **Windows (x64)** | [📦 Download MSI](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 | **Linux (DEB)** | [📦 Download DEB](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 | **Linux (RPM)** | [📦 Download RPM](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 | **Linux (JAR)** | [📦 Download JAR](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 
 > 💡 **Quick Install**: 
-> - **macOS**: `brew tap risa-labs-inc/homebrew && brew install --cask boss`
+> - **macOS**: `brew install --cask boss`
 > - **Ubuntu/Debian**: `curl -fsSL https://raw.githubusercontent.com/risa-labs-inc/BOSS-Releases/main/scripts/add-apt-repo.sh | sudo bash && sudo apt-get install boss`
 > - **Others**: Click any link above for direct downloads
 
@@ -104,8 +104,7 @@ BOSS includes optimized layouts for different roles:
 
 #### Option 1: Homebrew (Recommended)
 ```bash
-# Add tap and install
-brew tap risa-labs-inc/homebrew
+# Install directly from official Homebrew Cask repository
 brew install --cask boss
 ```
 
