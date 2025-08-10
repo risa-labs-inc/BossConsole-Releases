@@ -14,6 +14,10 @@ on:
         required: false
         type: boolean
         default: false
+      pr_message:
+        description: 'Custom message to append to official PR (e.g., "Critical crash fix for Apple Silicon")'
+        required: false
+        type: string
 
 env:
   GRADLE_OPTS: '-Dorg.gradle.daemon=false'
@@ -70,6 +74,7 @@ jobs:
           echo "TRIGGER_TYPE=$TRIGGER_TYPE" >> $GITHUB_OUTPUT
           echo "ASSET_NAME=BOSS-${VERSION}-Universal.dmg" >> $GITHUB_OUTPUT
           echo "DOWNLOAD_URL=https://github.com/risa-labs-inc/BOSS-Releases/releases/download/v${VERSION}/BOSS-${VERSION}-Universal.dmg" >> $GITHUB_OUTPUT
+          echo "PR_MESSAGE=${{ github.event.inputs.pr_message || '' }}" >> $GITHUB_OUTPUT
           echo "📦 Processing BOSS release $VERSION"
 
       - name: Skip official PR notification
@@ -267,10 +272,17 @@ jobs:
             # Push branch to our fork and create PR
             git push origin "$BRANCH_NAME"
             
-            if gh pr create \
-              --repo Homebrew/homebrew-cask \
-              --title "boss: update $VERSION" \
-              --body "Updates boss cask to version $VERSION
+            # Prepare PR body with optional custom message
+            PR_BODY="Updates boss cask to version $VERSION"
+            
+            # Add custom message if provided
+            if [[ -n "${{ steps.release_info.outputs.PR_MESSAGE }}" ]]; then
+              PR_BODY="$PR_BODY
+
+            **Note:** ${{ steps.release_info.outputs.PR_MESSAGE }}"
+            fi
+            
+            PR_BODY="$PR_BODY
 
             **Release Information:**
             - Version: $VERSION  
@@ -281,7 +293,12 @@ jobs:
             - Updated version from previous to $VERSION
             - Updated SHA256 hash for new release asset
 
-            BOSS is an AI-powered workspace for complex business operations." \
+            BOSS is an AI-powered workspace for complex business operations."
+            
+            if gh pr create \
+              --repo Homebrew/homebrew-cask \
+              --title "boss: update $VERSION" \
+              --body "$PR_BODY" \
               --head "kshivang:$BRANCH_NAME"; then
               echo "✅ Successfully created PR to homebrew-cask"
               echo "success=true" >> $GITHUB_OUTPUT
