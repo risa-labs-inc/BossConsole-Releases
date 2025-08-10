@@ -59,16 +59,14 @@ jobs:
           echo "DOWNLOAD_URL=https://github.com/risa-labs-inc/BOSS-Releases/releases/download/v${VERSION}/BOSS-${VERSION}-Universal.dmg" >> $GITHUB_OUTPUT
           echo "📦 Processing BOSS release $VERSION"
 
-      - name: Skip patch releases for automatic updates
+      - name: Patch release notification
         if: steps.release_info.outputs.TRIGGER_TYPE == 'patch_skip'
         run: |
-          echo "::notice::Patch release detected - skipping Homebrew update to avoid spam"
-          echo "To update Homebrew for patch releases, use the manual workflow trigger"
-          exit 0
+          echo "::notice::Patch release detected - updating tap but skipping official Homebrew PR to avoid spam"
+          echo "Tap will be updated automatically, but no PR will be created to homebrew-cask"
           
       - name: Calculate SHA256 hash for Homebrew
         id: calculate_hash
-        if: steps.release_info.outputs.TRIGGER_TYPE != 'patch_skip'
         run: |
           # Download the DMG file to calculate SHA256
           echo "⬇️ Downloading DMG to calculate SHA256..."
@@ -85,7 +83,6 @@ jobs:
 
       - name: Update Homebrew Tap
         id: update_tap
-        if: steps.release_info.outputs.TRIGGER_TYPE != 'patch_skip'
         run: |
           echo "🍺 Updating custom Homebrew tap..."
           
@@ -283,7 +280,7 @@ jobs:
 
 
       - name: Summary
-        if: always() && steps.release_info.outputs.TRIGGER_TYPE != 'patch_skip'
+        if: always()
         run: |
           echo "## 🍺 Homebrew Distribution Update Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -299,7 +296,9 @@ jobs:
             echo "❌ **Custom Tap**: Failed to update" >> $GITHUB_STEP_SUMMARY
           fi
           
-          if [[ "${{ steps.create_pr.outputs.success }}" == "true" ]]; then
+          if [[ "${{ steps.release_info.outputs.TRIGGER_TYPE }}" == "patch_skip" ]]; then
+            echo "⏭️ **Official Homebrew**: Skipped PR for patch release (tap updated)" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ steps.create_pr.outputs.success }}" == "true" ]]; then
             echo "✅ **Official Homebrew**: PR created successfully" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ **Official Homebrew**: PR creation failed (tap still updated)" >> $GITHUB_STEP_SUMMARY
