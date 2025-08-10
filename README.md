@@ -108,6 +108,13 @@ BOSS includes optimized layouts for different roles:
 brew install --cask boss
 ```
 
+> **🚀 For Latest Updates**: Use our tap for faster access to new releases:
+> ```bash
+> # Add Risa Labs tap for latest updates
+> brew tap risa-labs-inc/homebrew
+> brew install --cask boss
+> ```
+
 #### Option 2: Direct Download (DMG)
 1. Download the latest DMG file from [Releases](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
 2. Mount the DMG and drag BOSS to Applications
