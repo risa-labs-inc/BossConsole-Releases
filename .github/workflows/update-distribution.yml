@@ -132,12 +132,23 @@ jobs:
             exit 0
           fi
           
-          # Verify cask exists first
+          # Update Homebrew database to get latest casks
+          echo "🔄 Updating Homebrew database..."
+          brew update
+          
+          # Verify cask exists after update
+          echo "🔍 Checking if boss cask exists in official Homebrew..."
           if ! brew info --cask boss >/dev/null 2>&1; then
-            echo "⚠️ boss cask not found in official Homebrew"
+            echo "⚠️ boss cask not found in official Homebrew even after update"
+            echo "Available casks matching 'boss':"
+            brew search --cask boss || echo "No casks found matching 'boss'"
             echo "success=false" >> $GITHUB_OUTPUT
             exit 0
           fi
+          
+          # Show current cask info
+          echo "📋 Current boss cask info:"
+          brew info --cask boss
           
           # Use brew bump-cask-pr with proper hash
           if brew bump-cask-pr boss \
