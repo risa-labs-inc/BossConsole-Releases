@@ -161,11 +161,17 @@ jobs:
           git config user.name "BOSS Release Bot"
           git config user.email "noreply@risa-labs.com"
           
+          # Verify remotes
+          echo "🔍 Checking git remotes..."
+          git remote -v
+          
           # Add upstream remote and fetch latest changes
           git remote add upstream https://github.com/Homebrew/homebrew-cask.git
           git fetch upstream
           git checkout main
           git pull upstream main
+          
+          # Push updated main to our fork
           git push origin main
           
           # Create a new branch for the PR
