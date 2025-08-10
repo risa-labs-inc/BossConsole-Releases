@@ -121,6 +121,7 @@ jobs:
         id: create_pr
         env:
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_CASK_TOKEN }}
+          GH_TOKEN: ${{ secrets.HOMEBREW_CASK_TOKEN }}
         run: |
           echo "🚀 Creating PR to official Homebrew repository..."
           
