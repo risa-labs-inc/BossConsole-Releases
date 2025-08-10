@@ -36,9 +36,9 @@ jobs:
           echo "Source Version: ${{ github.event.inputs.source_version }}"
           echo "Description: ${{ github.event.inputs.rescue_description }}"
           
-          # Check if rescue version is valid
-          if [[ ! "${{ github.event.inputs.rescue_version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "❌ Invalid rescue version format. Use semantic versioning (e.g., 8.9.99)"
+          # Check if rescue version is valid (supports 3 or 4 part versions)
+          if [[ ! "${{ github.event.inputs.rescue_version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+            echo "❌ Invalid rescue version format. Use semantic versioning (e.g., 8.9.99 or 8.9.9.1)"
             exit 1
           fi
           
