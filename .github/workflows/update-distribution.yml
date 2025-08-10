@@ -43,7 +43,7 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "RELEASE_URL=$RELEASE_URL" >> $GITHUB_OUTPUT
           echo "ASSET_NAME=BOSS-${VERSION}-Universal.dmg" >> $GITHUB_OUTPUT
-          echo "DOWNLOAD_URL=https://github.com/risa-labs-inc/BOSS-Kotlin/releases/download/v${VERSION}/BOSS-${VERSION}-Universal.dmg" >> $GITHUB_OUTPUT
+          echo "DOWNLOAD_URL=https://github.com/risa-labs-inc/BOSS-Releases/releases/download/v${VERSION}/BOSS-${VERSION}-Universal.dmg" >> $GITHUB_OUTPUT
           echo "📦 Processing BOSS release $VERSION"
 
       - name: Calculate SHA256 hash for Homebrew
