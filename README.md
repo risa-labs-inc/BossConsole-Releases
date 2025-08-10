@@ -18,7 +18,7 @@ BOSS (Business OS + Simulator) is a sophisticated, AI-powered workspace designed
 | **Linux (JAR)** | [📦 Download JAR](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 
 > 💡 **Quick Install**: 
-> - **macOS**: `brew install --cask boss` or `brew install risa-labs-inc/homebrew/boss`
+> - **macOS**: `brew install --cask boss` or `brew install --cask risa-labs-inc/homebrew/boss`
 > - **Linux**: Download and install DEB/RPM packages directly (see installation guide below)
 > - **Windows**: Download MSI installer from releases
 
@@ -108,13 +108,22 @@ BOSS includes optimized layouts for different roles:
 ```bash
 # Add Risa Labs tap for fastest access to new releases
 brew tap risa-labs-inc/homebrew
-brew install boss
+brew install --cask boss
 ```
 
 **Official Homebrew Cask**
 ```bash
 # Install from official Homebrew (may have slight delay for new releases)
 brew install --cask boss
+```
+
+**Upgrading BOSS**
+```bash
+# Update Homebrew database and upgrade BOSS to latest version
+brew update && brew upgrade --cask boss
+
+# For custom tap users
+brew upgrade --cask risa-labs-inc/homebrew/boss
 ```
 
 #### Option 2: Direct Download (DMG)
@@ -176,13 +185,25 @@ wget $(curl -s https://api.github.com/repos/risa-labs-inc/BOSS-Releases/releases
 java -jar BOSS-*.jar
 ```
 
-## 🔄 Auto-Update
+## 🔄 Updates
 
+### Built-in Auto-Update
 BOSS includes an intelligent auto-update system:
 - **Automatic Detection**: Checks for updates on startup
 - **Background Downloads**: Updates download while you work
 - **Staged Installation**: Applies updates on next restart
 - **Rollback Support**: Easy reversion if issues occur
+
+### Manual Updates
+**Homebrew Users (macOS)**
+```bash
+# Update to latest version via Homebrew
+brew update && brew upgrade --cask boss
+```
+
+**Direct Download Users**
+- Download the latest version from [Releases](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
+- Install over existing installation (settings preserved)
 
 ## 🛠️ Configuration
 
