@@ -185,8 +185,21 @@ jobs:
           echo "🔍 Final git remotes (origin=fork, upstream=official):"
           git remote -v
           
-          # Create a new branch for the PR
+          # Create a new branch for the PR (delete if exists)
           BRANCH_NAME="bump-boss-${{ steps.release_info.outputs.VERSION }}"
+          
+          # Delete existing branch if it exists (locally and remotely)
+          if git show-ref --verify --quiet refs/heads/$BRANCH_NAME; then
+            echo "🗑️ Deleting existing local branch $BRANCH_NAME"
+            git branch -D $BRANCH_NAME
+          fi
+          
+          if git ls-remote --heads origin $BRANCH_NAME | grep -q $BRANCH_NAME; then
+            echo "🗑️ Deleting existing remote branch $BRANCH_NAME"
+            git push origin --delete $BRANCH_NAME
+          fi
+          
+          # Create fresh branch
           git checkout -b "$BRANCH_NAME"
           
           # Update the boss.rb cask file
