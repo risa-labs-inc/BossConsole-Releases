@@ -18,9 +18,9 @@ BOSS (Business OS + Simulator) is a sophisticated, AI-powered workspace designed
 | **Linux (JAR)** | [📦 Download JAR](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
 
 > 💡 **Quick Install**: 
-> - **macOS**: `brew install --cask boss`
-> - **Ubuntu/Debian**: `curl -fsSL https://raw.githubusercontent.com/risa-labs-inc/BOSS-Releases/main/scripts/add-apt-repo.sh | sudo bash && sudo apt-get install boss`
-> - **Others**: Click any link above for direct downloads
+> - **macOS**: `brew install --cask boss` or `brew install risa-labs-inc/homebrew/boss`
+> - **Linux**: Download and install DEB/RPM packages directly (see installation guide below)
+> - **Windows**: Download MSI installer from releases
 
 ## 📋 What is BOSS?
 
@@ -103,17 +103,19 @@ BOSS includes optimized layouts for different roles:
 ### macOS
 
 #### Option 1: Homebrew (Recommended)
+
+**For Latest Updates (Recommended)**
 ```bash
-# Install directly from official Homebrew Cask repository
-brew install --cask boss
+# Add Risa Labs tap for fastest access to new releases
+brew tap risa-labs-inc/homebrew
+brew install boss
 ```
 
-> **🚀 For Latest Updates**: Use our tap for faster access to new releases:
-> ```bash
-> # Add Risa Labs tap for latest updates
-> brew tap risa-labs-inc/homebrew
-> brew install --cask boss
-> ```
+**Official Homebrew Cask**
+```bash
+# Install from official Homebrew (may have slight delay for new releases)
+brew install --cask boss
+```
 
 #### Option 2: Direct Download (DMG)
 1. Download the latest DMG file from [Releases](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
@@ -127,21 +129,10 @@ brew install --cask boss
 
 ### Linux
 
+> **📝 Note**: BOSS packages are large (~250MB) and exceed GitHub's file size limits for APT repositories. We provide direct downloads from GitHub Releases instead, which is actually simpler and more reliable for large applications.
+
 #### Ubuntu/Debian (DEB Package)
 
-**Option 1: APT Repository (Recommended)**
-```bash
-# Add BOSS repository
-curl -fsSL https://raw.githubusercontent.com/risa-labs-inc/BOSS-Releases/main/scripts/add-apt-repo.sh | sudo bash
-
-# Install BOSS
-sudo apt-get install boss
-
-# Launch
-boss
-```
-
-**Option 2: Direct Download**
 ```bash
 # Download latest DEB package
 wget $(curl -s https://api.github.com/repos/risa-labs-inc/BOSS-Releases/releases/latest | grep "browser_download_url.*\.deb" | cut -d '"' -f 4)
@@ -152,6 +143,14 @@ sudo apt-get install -f  # Fix any missing dependencies
 
 # Launch
 boss
+```
+
+**Alternative: Direct download with specific version**
+```bash
+# Download specific version (replace 8.11.3 with desired version)
+wget https://github.com/risa-labs-inc/BOSS-Releases/releases/download/v8.11.3/BOSS-8.11.3.deb
+sudo dpkg -i BOSS-8.11.3.deb
+sudo apt-get install -f
 ```
 
 #### RHEL/Fedora/openSUSE (RPM Package)
