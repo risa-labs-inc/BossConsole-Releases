@@ -9,6 +9,11 @@ on:
         description: 'Version to update (e.g., 8.11.3)'
         required: true
         type: string
+      skip_official_pr:
+        description: 'Skip creating PR to official homebrew-cask (only update tap)'
+        required: false
+        type: boolean
+        default: false
 
 env:
   GRADLE_OPTS: '-Dorg.gradle.daemon=false'
@@ -33,7 +38,15 @@ jobs:
             VERSION="${{ github.event.inputs.version }}"
             RELEASE_URL="https://github.com/risa-labs-inc/BOSS-Releases/releases/tag/v${VERSION}"
             echo "🔧 Manual trigger for version: $VERSION"
-            TRIGGER_TYPE="manual"
+            
+            # Check if user wants to skip official PR
+            if [[ "${{ github.event.inputs.skip_official_pr }}" == "true" ]]; then
+              echo "⏭️ Manual trigger with skip official PR option enabled"
+              TRIGGER_TYPE="manual_skip_pr"
+            else
+              echo "🚀 Manual trigger with official PR creation enabled"
+              TRIGGER_TYPE="manual"
+            fi
           else
             # Release trigger - extract from tag and check if it's minor/major
             VERSION="${GITHUB_REF#refs/tags/v}"
@@ -59,11 +72,16 @@ jobs:
           echo "DOWNLOAD_URL=https://github.com/risa-labs-inc/BOSS-Releases/releases/download/v${VERSION}/BOSS-${VERSION}-Universal.dmg" >> $GITHUB_OUTPUT
           echo "📦 Processing BOSS release $VERSION"
 
-      - name: Patch release notification
-        if: steps.release_info.outputs.TRIGGER_TYPE == 'patch_skip'
+      - name: Skip official PR notification
+        if: steps.release_info.outputs.TRIGGER_TYPE == 'patch_skip' || steps.release_info.outputs.TRIGGER_TYPE == 'manual_skip_pr'
         run: |
-          echo "::notice::Patch release detected - updating tap but skipping official Homebrew PR to avoid spam"
-          echo "Tap will be updated automatically, but no PR will be created to homebrew-cask"
+          if [[ "${{ steps.release_info.outputs.TRIGGER_TYPE }}" == "patch_skip" ]]; then
+            echo "::notice::Patch release detected - updating tap but skipping official Homebrew PR to avoid spam"
+            echo "Tap will be updated automatically, but no PR will be created to homebrew-cask"
+          else
+            echo "::notice::Manual trigger with skip official PR option - updating tap only"
+            echo "Tap will be updated automatically, but no PR will be created to homebrew-cask per user request"
+          fi
           
       - name: Calculate SHA256 hash for Homebrew
         id: calculate_hash
@@ -132,11 +150,11 @@ jobs:
           fi
 
       - name: Setup Homebrew for official PR
-        if: steps.update_tap.outputs.success == 'true' && steps.release_info.outputs.TRIGGER_TYPE != 'patch_skip'
+        if: steps.update_tap.outputs.success == 'true' && steps.release_info.outputs.TRIGGER_TYPE != 'patch_skip' && steps.release_info.outputs.TRIGGER_TYPE != 'manual_skip_pr'
         uses: Homebrew/actions/setup-homebrew@master
 
       - name: Create PR to official Homebrew
-        if: steps.update_tap.outputs.success == 'true' && steps.release_info.outputs.TRIGGER_TYPE != 'patch_skip'
+        if: steps.update_tap.outputs.success == 'true' && steps.release_info.outputs.TRIGGER_TYPE != 'patch_skip' && steps.release_info.outputs.TRIGGER_TYPE != 'manual_skip_pr'
         id: create_pr
         env:
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_CASK_TOKEN }}
@@ -298,6 +316,8 @@ jobs:
           
           if [[ "${{ steps.release_info.outputs.TRIGGER_TYPE }}" == "patch_skip" ]]; then
             echo "⏭️ **Official Homebrew**: Skipped PR for patch release (tap updated)" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ steps.release_info.outputs.TRIGGER_TYPE }}" == "manual_skip_pr" ]]; then
+            echo "⏭️ **Official Homebrew**: Skipped PR per manual trigger option (tap updated)" >> $GITHUB_STEP_SUMMARY
           elif [[ "${{ steps.create_pr.outputs.success }}" == "true" ]]; then
             echo "✅ **Official Homebrew**: PR created successfully" >> $GITHUB_STEP_SUMMARY
           else
