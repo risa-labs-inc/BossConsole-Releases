@@ -150,8 +150,9 @@ jobs:
           echo "📋 Current boss cask info:"
           brew info --cask boss
           
-          # Use brew bump-cask-pr with proper hash
-          if brew bump-cask-pr boss \
+          # Use brew bump-cask-pr with proper hash (update first to ensure fresh context)
+          echo "🚀 Running brew bump-cask-pr with fresh update..."
+          if brew update && brew bump-cask-pr boss \
             --version="${{ steps.release_info.outputs.VERSION }}" \
             --sha256="${{ steps.calculate_hash.outputs.SHA256 }}" \
             --no-browse; then
@@ -159,7 +160,8 @@ jobs:
             echo "success=true" >> $GITHUB_OUTPUT
           else
             echo "❌ Failed to create PR to homebrew-cask"
-            echo "Current boss cask version: $(brew info --cask boss | grep -E '^boss:' | head -1)"
+            echo "Current boss cask version after fresh update:"
+            brew info --cask boss | grep -E '^boss:' | head -1 || echo "Could not get cask info"
             echo "success=false" >> $GITHUB_OUTPUT
             # Don't fail the entire workflow for Homebrew PR issues
           fi
