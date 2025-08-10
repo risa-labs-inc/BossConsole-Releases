@@ -1,0 +1,266 @@
+name: Update Distribution Channels
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:  # Allow manual trigger
+    inputs:
+      version:
+        description: 'Version to update (e.g., 8.11.3)'
+        required: true
+        type: string
+      update_homebrew:
+        description: 'Update Homebrew distribution'
+        required: true
+        default: true
+        type: boolean
+      update_apt:
+        description: 'Update APT repository'
+        required: true
+        default: true
+        type: boolean
+
+env:
+  GRADLE_OPTS: '-Dorg.gradle.daemon=false'
+
+jobs:
+  update-distribution:
+    name: Update All Distribution Channels
+    runs-on: ubuntu-latest
+    if: "!github.event.release.prerelease"
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Extract release information
+        id: release_info
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            # Manual trigger - use input version
+            VERSION="${{ github.event.inputs.version }}"
+            RELEASE_URL="https://github.com/risa-labs-inc/BOSS-Releases/releases/tag/v${VERSION}"
+            echo "🔧 Manual trigger for version: $VERSION"
+          else
+            # Release trigger - extract from tag
+            VERSION="${GITHUB_REF#refs/tags/v}"
+            RELEASE_URL="${{ github.event.release.html_url }}"
+            echo "🚀 Release trigger for version: $VERSION"
+          fi
+          
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "RELEASE_URL=$RELEASE_URL" >> $GITHUB_OUTPUT
+          echo "ASSET_NAME=BOSS-${VERSION}-Universal.dmg" >> $GITHUB_OUTPUT
+          echo "DOWNLOAD_URL=https://github.com/risa-labs-inc/BOSS-Releases/releases/download/v${VERSION}/BOSS-${VERSION}-Universal.dmg" >> $GITHUB_OUTPUT
+          echo "📦 Processing BOSS release $VERSION"
+
+      - name: Calculate SHA256 hash for Homebrew
+        id: calculate_hash
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.update_homebrew == 'true'
+        run: |
+          # Download the DMG file to calculate SHA256
+          echo "⬇️ Downloading DMG to calculate SHA256..."
+          curl -fsSL -o "BOSS-${{ steps.release_info.outputs.VERSION }}-Universal.dmg" \
+            "${{ steps.release_info.outputs.DOWNLOAD_URL }}"
+          
+          # Calculate SHA256
+          SHA256=$(sha256sum "BOSS-${{ steps.release_info.outputs.VERSION }}-Universal.dmg" | cut -d' ' -f1)
+          echo "SHA256=$SHA256" >> $GITHUB_OUTPUT
+          echo "🔒 Calculated SHA256: $SHA256"
+          
+          # Clean up downloaded file
+          rm -f "BOSS-${{ steps.release_info.outputs.VERSION }}-Universal.dmg"
+
+      - name: Update Homebrew Tap
+        id: update_tap
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.update_homebrew == 'true'
+        run: |
+          echo "🍺 Updating custom Homebrew tap..."
+          
+          # Clone the tap repository
+          git clone https://${{ secrets.HOMEBREW_TAP_TOKEN }}@github.com/risa-labs-inc/homebrew.git homebrew-tap
+          cd homebrew-tap
+          
+          # Configure git
+          git config user.name "BOSS Release Bot"
+          git config user.email "noreply@risa-labs.com"
+          
+          # Update the cask file
+          VERSION="${{ steps.release_info.outputs.VERSION }}"
+          SHA256="${{ steps.calculate_hash.outputs.SHA256 }}"
+          
+          # Update version and SHA256 in boss.rb
+          sed -i "s/version \"[^\"]*\"/version \"$VERSION\"/" Casks/boss.rb
+          sed -i "s/sha256 \"[^\"]*\"/sha256 \"$SHA256\"/" Casks/boss.rb
+          
+          # Verify changes
+          echo "📝 Updated cask file content:"
+          head -10 Casks/boss.rb
+          
+          # Commit and push changes
+          git add Casks/boss.rb
+          git commit -m "🚀 Update BOSS to version $VERSION
+
+          Release: ${{ steps.release_info.outputs.RELEASE_URL }}
+          SHA256: $SHA256"
+          
+          # Push with retry logic
+          for i in {1..3}; do
+            if git push; then
+              echo "✅ Successfully pushed to tap repository"
+              echo "success=true" >> $GITHUB_OUTPUT
+              break
+            else
+              echo "❌ Push attempt $i failed, retrying in 5 seconds..."
+              sleep 5
+              git pull --rebase
+            fi
+          done
+
+      - name: Setup Homebrew for official PR
+        if: (github.event_name != 'workflow_dispatch' || github.event.inputs.update_homebrew == 'true') && steps.update_tap.outputs.success == 'true'
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Create PR to official Homebrew
+        if: (github.event_name != 'workflow_dispatch' || github.event.inputs.update_homebrew == 'true') && steps.update_tap.outputs.success == 'true'
+        id: create_pr
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_CASK_TOKEN }}
+        run: |
+          echo "🚀 Creating PR to official Homebrew repository..."
+          
+          # Use brew bump-cask-pr with proper hash
+          if brew bump-cask-pr boss \
+            --version="${{ steps.release_info.outputs.VERSION }}" \
+            --sha256="${{ steps.calculate_hash.outputs.SHA256 }}" \
+            --no-browse; then
+            echo "✅ Successfully created PR to homebrew-cask"
+            echo "success=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Failed to create PR to homebrew-cask"
+            echo "success=false" >> $GITHUB_OUTPUT
+            # Don't fail the entire workflow for Homebrew PR issues
+          fi
+
+      - name: Install APT dependencies
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.update_apt == 'true'
+        run: |
+          echo "📦 Installing APT repository dependencies..."
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev
+          
+      - name: Download DEB package for APT
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.update_apt == 'true'
+        run: |
+          VERSION="${{ steps.release_info.outputs.VERSION }}"
+          
+          # Download the .deb file
+          echo "📦 Downloading BOSS-${VERSION}.deb for APT repository..."
+          curl -L "https://github.com/risa-labs-inc/BOSS-Releases/releases/download/v${VERSION}/BOSS-${VERSION}.deb" \
+               -o "BOSS-${VERSION}.deb"
+          
+      - name: Update APT repository
+        id: update_apt
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.update_apt == 'true'
+        run: |
+          VERSION="${{ steps.release_info.outputs.VERSION }}"
+          
+          echo "📦 Updating APT repository for version $VERSION..."
+          
+          # Move .deb to pool
+          mkdir -p apt/pool/main/b/boss
+          mv "BOSS-${VERSION}.deb" apt/pool/main/b/boss/
+          
+          # Generate Packages file
+          cd apt
+          mkdir -p dists/stable/main/binary-amd64
+          dpkg-scanpackages pool/main > dists/stable/main/binary-amd64/Packages
+          gzip -9c dists/stable/main/binary-amd64/Packages > dists/stable/main/binary-amd64/Packages.gz
+          
+          # Create Release file
+          cat > dists/stable/Release << EOF
+          Origin: Risa Labs
+          Label: BOSS
+          Suite: stable
+          Codename: stable
+          Version: 1.0
+          Architectures: amd64
+          Components: main
+          Description: BOSS - Business OS plus Simulations APT Repository
+          Date: $(date -Ru)
+          EOF
+          
+          # Add checksums with proper formatting
+          echo "MD5Sum:" >> dists/stable/Release
+          (cd dists/stable && find main -type f -name "Packages*" | while read file; do
+              SIZE=$(stat -c%s "$file")
+              MD5=$(md5sum "$file" | cut -d' ' -f1)
+              echo " $MD5 $SIZE $file" >> Release
+          done)
+          
+          echo "SHA256:" >> dists/stable/Release
+          (cd dists/stable && find main -type f -name "Packages*" | while read file; do
+              SIZE=$(stat -c%s "$file")
+              SHA256=$(sha256sum "$file" | cut -d' ' -f1)
+              echo " $SHA256 $SIZE $file" >> Release
+          done)
+          
+          echo "success=true" >> $GITHUB_OUTPUT
+          echo "✅ APT repository updated successfully"
+          
+      - name: Commit and push all changes
+        if: steps.update_apt.outputs.success == 'true'
+        run: |
+          echo "💾 Committing all distribution updates..."
+          
+          git config user.name "BOSS Release Bot"
+          git config user.email "noreply@risa-labs.com"
+          
+          git add apt/
+          git commit -m "📦 Update distribution channels for BOSS ${{ steps.release_info.outputs.VERSION }}
+
+          - Updated APT repository with new DEB package
+          - Homebrew tap updated with SHA256: ${{ steps.calculate_hash.outputs.SHA256 }}
+          - Official Homebrew PR: ${{ steps.create_pr.outputs.success == 'true' && 'Created' || 'Attempted' }}
+
+          Release: ${{ steps.release_info.outputs.RELEASE_URL }}
+          
+          Co-authored-by: ${{ github.event.release.author.login }} <${{ github.event.release.author.id }}+${{ github.event.release.author.login }}@users.noreply.github.com>"
+          
+          git push
+          echo "✅ All changes pushed successfully"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 📦 Distribution Update Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Version**: ${{ steps.release_info.outputs.VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Release**: ${{ steps.release_info.outputs.RELEASE_URL }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🍺 Homebrew Distribution" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ steps.update_tap.outputs.success }}" == "true" ]]; then
+            echo "✅ **Custom Tap**: Updated successfully" >> $GITHUB_STEP_SUMMARY
+            echo "   - SHA256: ${{ steps.calculate_hash.outputs.SHA256 }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Custom Tap**: Failed to update" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ steps.create_pr.outputs.success }}" == "true" ]]; then
+            echo "✅ **Official Homebrew**: PR created successfully" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **Official Homebrew**: PR creation failed (tap still updated)" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 APT Repository" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ steps.update_apt.outputs.success }}" == "true" ]]; then
+            echo "✅ **APT Repository**: Updated successfully" >> $GITHUB_STEP_SUMMARY
+            echo "   - Package: BOSS-${{ steps.release_info.outputs.VERSION }}.deb" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **APT Repository**: Failed to update" >> $GITHUB_STEP_SUMMARY
+          fi
