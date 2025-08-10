@@ -194,6 +194,8 @@ BOSS includes an intelligent auto-update system:
 - **Staged Installation**: Applies updates on next restart
 - **Rollback Support**: Easy reversion if issues occur
 
+> **⚠️ Important for versions < 8.11.4**: If you're running BOSS version 8.11.3 or earlier, the auto-update system has a version comparison bug that prevents it from detecting newer versions. Please manually update to 8.11.4 or later using the methods below to restore proper auto-update functionality.
+
 ### Manual Updates
 **Homebrew Users (macOS)**
 ```bash
@@ -204,6 +206,8 @@ brew update && brew upgrade --cask boss
 **Direct Download Users**
 - Download the latest version from [Releases](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
 - Install over existing installation (settings preserved)
+
+> **🍎 Apple Silicon Users**: Version 8.11.4 includes a critical fix for a crash that prevented BOSS from launching on Apple Silicon Macs. If you're experiencing startup crashes, please update to 8.11.4 or later immediately.
 
 ## 🛠️ Configuration
 
