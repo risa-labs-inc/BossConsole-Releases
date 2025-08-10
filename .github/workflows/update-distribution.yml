@@ -150,19 +150,23 @@ jobs:
           echo "📋 Current boss cask info:"
           brew info --cask boss
           
-          # Use gh CLI to create PR directly to homebrew-cask repository
-          echo "🚀 Creating PR to homebrew-cask using gh CLI..."
+          # Use existing fork at https://github.com/kshivang/homebrew-cask
+          echo "🚀 Creating PR to homebrew-cask using existing fork..."
           
-          # Clone homebrew-cask repository with token authentication
-          git clone https://token:$HOMEBREW_GITHUB_API_TOKEN@github.com/Homebrew/homebrew-cask.git homebrew-cask-repo
+          # Clone the existing fork with token authentication  
+          git clone https://token:$HOMEBREW_GITHUB_API_TOKEN@github.com/kshivang/homebrew-cask.git homebrew-cask-repo
           cd homebrew-cask-repo
           
           # Configure git
           git config user.name "BOSS Release Bot"
           git config user.email "noreply@risa-labs.com"
           
-          # Set up authentication for pushing
-          git remote set-url origin https://token:$HOMEBREW_GITHUB_API_TOKEN@github.com/Homebrew/homebrew-cask.git
+          # Add upstream remote and fetch latest changes
+          git remote add upstream https://github.com/Homebrew/homebrew-cask.git
+          git fetch upstream
+          git checkout main
+          git pull upstream main
+          git push origin main
           
           # Create a new branch for the PR
           BRANCH_NAME="bump-boss-${{ steps.release_info.outputs.VERSION }}"
@@ -193,7 +197,7 @@ jobs:
             - SHA256: $SHA256
             - Release: ${{ steps.release_info.outputs.RELEASE_URL }}"
             
-            # Push branch and create PR
+            # Push branch to our fork and create PR
             git push origin "$BRANCH_NAME"
             
             if gh pr create \
@@ -211,7 +215,7 @@ jobs:
             - Updated SHA256 hash for new release asset
 
             This is an automated update for the BOSS application." \
-              --head "$BRANCH_NAME"; then
+              --head "kshivang:$BRANCH_NAME"; then
               echo "✅ Successfully created PR to homebrew-cask"
               echo "success=true" >> $GITHUB_OUTPUT
             else
