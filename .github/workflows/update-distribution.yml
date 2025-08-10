@@ -153,13 +153,16 @@ jobs:
           # Use gh CLI to create PR directly to homebrew-cask repository
           echo "🚀 Creating PR to homebrew-cask using gh CLI..."
           
-          # Clone homebrew-cask repository
-          git clone https://github.com/Homebrew/homebrew-cask.git homebrew-cask-repo
+          # Clone homebrew-cask repository with token authentication
+          git clone https://token:$HOMEBREW_GITHUB_API_TOKEN@github.com/Homebrew/homebrew-cask.git homebrew-cask-repo
           cd homebrew-cask-repo
           
           # Configure git
           git config user.name "BOSS Release Bot"
           git config user.email "noreply@risa-labs.com"
+          
+          # Set up authentication for pushing
+          git remote set-url origin https://token:$HOMEBREW_GITHUB_API_TOKEN@github.com/Homebrew/homebrew-cask.git
           
           # Create a new branch for the PR
           BRANCH_NAME="bump-boss-${{ steps.release_info.outputs.VERSION }}"
