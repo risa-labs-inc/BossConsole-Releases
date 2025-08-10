@@ -25,7 +25,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Extract release information
+      - name: Extract release information and check version type
         id: release_info
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
@@ -33,21 +33,42 @@ jobs:
             VERSION="${{ github.event.inputs.version }}"
             RELEASE_URL="https://github.com/risa-labs-inc/BOSS-Releases/releases/tag/v${VERSION}"
             echo "🔧 Manual trigger for version: $VERSION"
+            TRIGGER_TYPE="manual"
           else
-            # Release trigger - extract from tag
+            # Release trigger - extract from tag and check if it's minor/major
             VERSION="${GITHUB_REF#refs/tags/v}"
             RELEASE_URL="${{ github.event.release.html_url }}"
-            echo "🚀 Release trigger for version: $VERSION"
+            
+            # Parse version to determine if it's patch (x.y.z where z > 0) vs minor/major
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+            
+            if [[ "$PATCH" != "0" ]]; then
+              echo "🔄 Patch release detected ($VERSION) - skipping automatic Homebrew update"
+              echo "Use manual trigger for patch releases to avoid spam"
+              TRIGGER_TYPE="patch_skip"
+            else
+              echo "🚀 Major/Minor release trigger for version: $VERSION"
+              TRIGGER_TYPE="auto_major_minor"
+            fi
           fi
           
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "RELEASE_URL=$RELEASE_URL" >> $GITHUB_OUTPUT
+          echo "TRIGGER_TYPE=$TRIGGER_TYPE" >> $GITHUB_OUTPUT
           echo "ASSET_NAME=BOSS-${VERSION}-Universal.dmg" >> $GITHUB_OUTPUT
           echo "DOWNLOAD_URL=https://github.com/risa-labs-inc/BOSS-Releases/releases/download/v${VERSION}/BOSS-${VERSION}-Universal.dmg" >> $GITHUB_OUTPUT
           echo "📦 Processing BOSS release $VERSION"
 
+      - name: Skip patch releases for automatic updates
+        if: steps.release_info.outputs.TRIGGER_TYPE == 'patch_skip'
+        run: |
+          echo "::notice::Patch release detected - skipping Homebrew update to avoid spam"
+          echo "To update Homebrew for patch releases, use the manual workflow trigger"
+          exit 0
+          
       - name: Calculate SHA256 hash for Homebrew
         id: calculate_hash
+        if: steps.release_info.outputs.TRIGGER_TYPE != 'patch_skip'
         run: |
           # Download the DMG file to calculate SHA256
           echo "⬇️ Downloading DMG to calculate SHA256..."
@@ -64,6 +85,7 @@ jobs:
 
       - name: Update Homebrew Tap
         id: update_tap
+        if: steps.release_info.outputs.TRIGGER_TYPE != 'patch_skip'
         run: |
           echo "🍺 Updating custom Homebrew tap..."
           
@@ -113,11 +135,11 @@ jobs:
           fi
 
       - name: Setup Homebrew for official PR
-        if: steps.update_tap.outputs.success == 'true'
+        if: steps.update_tap.outputs.success == 'true' && steps.release_info.outputs.TRIGGER_TYPE != 'patch_skip'
         uses: Homebrew/actions/setup-homebrew@master
 
       - name: Create PR to official Homebrew
-        if: steps.update_tap.outputs.success == 'true'
+        if: steps.update_tap.outputs.success == 'true' && steps.release_info.outputs.TRIGGER_TYPE != 'patch_skip'
         id: create_pr
         env:
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_CASK_TOKEN }}
@@ -244,7 +266,7 @@ jobs:
             - Updated version from previous to $VERSION
             - Updated SHA256 hash for new release asset
 
-            This is an automated update for the BOSS application." \
+            BOSS is an AI-powered workspace for complex business operations." \
               --head "kshivang:$BRANCH_NAME"; then
               echo "✅ Successfully created PR to homebrew-cask"
               echo "success=true" >> $GITHUB_OUTPUT
@@ -261,7 +283,7 @@ jobs:
 
 
       - name: Summary
-        if: always()
+        if: always() && steps.release_info.outputs.TRIGGER_TYPE != 'patch_skip'
         run: |
           echo "## 🍺 Homebrew Distribution Update Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
