@@ -172,13 +172,13 @@ jobs:
           echo "🔄 Fetching latest changes from upstream official repo..."
           git fetch upstream
           
-          # Update our main branch with upstream changes
+          # Reset our main to match upstream exactly (cleanest approach)
           git checkout main
-          git merge upstream/main
+          git reset --hard upstream/main
           
-          # Push updated main to our fork (origin)
-          echo "📤 Pushing updated main to our fork..."
-          git push origin main
+          # Force push to sync our fork with upstream
+          echo "📤 Force pushing updated main to our fork..."
+          git push origin main --force
           
           # Verify final remote setup
           echo "🔍 Final git remotes (origin=fork, upstream=official):"
