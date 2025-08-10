@@ -165,6 +165,9 @@ jobs:
           echo "🔍 Checking git remotes..."
           git remote -v
           
+          # Ensure origin points to our fork with authentication
+          git remote set-url origin https://token:$HOMEBREW_GITHUB_API_TOKEN@github.com/kshivang/homebrew-cask.git
+          
           # Add upstream remote and fetch latest changes
           git remote add upstream https://github.com/Homebrew/homebrew-cask.git
           git fetch upstream
@@ -173,6 +176,10 @@ jobs:
           
           # Push updated main to our fork
           git push origin main
+          
+          # Verify remotes after setup
+          echo "🔍 Final git remotes:"
+          git remote -v
           
           # Create a new branch for the PR
           BRANCH_NAME="bump-boss-${{ steps.release_info.outputs.VERSION }}"
