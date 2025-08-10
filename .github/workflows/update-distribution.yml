@@ -150,21 +150,77 @@ jobs:
           echo "📋 Current boss cask info:"
           brew info --cask boss
           
-          # Use brew bump-cask-pr with proper hash (update first to ensure fresh context)
-          echo "🚀 Running brew bump-cask-pr with fresh update..."
-          if brew update && brew bump-cask-pr boss \
-            --version="${{ steps.release_info.outputs.VERSION }}" \
-            --sha256="${{ steps.calculate_hash.outputs.SHA256 }}" \
-            --no-browse; then
-            echo "✅ Successfully created PR to homebrew-cask"
-            echo "success=true" >> $GITHUB_OUTPUT
+          # Use gh CLI to create PR directly to homebrew-cask repository
+          echo "🚀 Creating PR to homebrew-cask using gh CLI..."
+          
+          # Clone homebrew-cask repository
+          git clone https://github.com/Homebrew/homebrew-cask.git homebrew-cask-repo
+          cd homebrew-cask-repo
+          
+          # Configure git
+          git config user.name "BOSS Release Bot"
+          git config user.email "noreply@risa-labs.com"
+          
+          # Create a new branch for the PR
+          BRANCH_NAME="bump-boss-${{ steps.release_info.outputs.VERSION }}"
+          git checkout -b "$BRANCH_NAME"
+          
+          # Update the boss.rb cask file
+          VERSION="${{ steps.release_info.outputs.VERSION }}"
+          SHA256="${{ steps.calculate_hash.outputs.SHA256 }}"
+          
+          # Find and update the boss cask file
+          CASK_FILE="Casks/b/boss.rb"
+          if [ -f "$CASK_FILE" ]; then
+            echo "📝 Updating $CASK_FILE with version $VERSION"
+            
+            # Update version and SHA256
+            sed -i "s/version \"[^\"]*\"/version \"$VERSION\"/" "$CASK_FILE"
+            sed -i "s/sha256 \"[^\"]*\"/sha256 \"$SHA256\"/" "$CASK_FILE"
+            
+            echo "📋 Updated cask content:"
+            head -10 "$CASK_FILE"
+            
+            # Commit changes
+            git add "$CASK_FILE"
+            git commit -m "boss: update $VERSION
+
+            Release notes:
+            - Updated to version $VERSION
+            - SHA256: $SHA256
+            - Release: ${{ steps.release_info.outputs.RELEASE_URL }}"
+            
+            # Push branch and create PR
+            git push origin "$BRANCH_NAME"
+            
+            if gh pr create \
+              --repo Homebrew/homebrew-cask \
+              --title "boss: update $VERSION" \
+              --body "Updates boss cask to version $VERSION
+
+            **Release Information:**
+            - Version: $VERSION  
+            - SHA256: \`$SHA256\`
+            - Release URL: ${{ steps.release_info.outputs.RELEASE_URL }}
+
+            **Changes:**
+            - Updated version from previous to $VERSION
+            - Updated SHA256 hash for new release asset
+
+            This is an automated update for the BOSS application." \
+              --head "$BRANCH_NAME"; then
+              echo "✅ Successfully created PR to homebrew-cask"
+              echo "success=true" >> $GITHUB_OUTPUT
+            else
+              echo "❌ Failed to create PR to homebrew-cask"
+              echo "success=false" >> $GITHUB_OUTPUT
+            fi
           else
-            echo "❌ Failed to create PR to homebrew-cask"
-            echo "Current boss cask version after fresh update:"
-            brew info --cask boss | grep -E '^boss:' | head -1 || echo "Could not get cask info"
+            echo "❌ Could not find boss cask file at $CASK_FILE"
             echo "success=false" >> $GITHUB_OUTPUT
-            # Don't fail the entire workflow for Homebrew PR issues
           fi
+          
+          cd ..
 
 
       - name: Summary
