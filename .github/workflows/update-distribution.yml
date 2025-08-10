@@ -161,24 +161,27 @@ jobs:
           git config user.name "kshivang"
           git config user.email "shivang.iitk@gmail.com"
           
-          # Verify remotes
-          echo "🔍 Checking git remotes..."
+          # Verify remotes (origin should be our fork, we'll add upstream for official repo)
+          echo "🔍 Initial git remotes after cloning from fork:"
           git remote -v
           
-          # Ensure origin points to our fork with authentication
-          git remote set-url origin https://token:$HOMEBREW_GITHUB_API_TOKEN@github.com/kshivang/homebrew-cask.git
-          
-          # Add upstream remote and fetch latest changes
+          # Add upstream remote pointing to official Homebrew repo
           git remote add upstream https://github.com/Homebrew/homebrew-cask.git
-          git fetch upstream
-          git checkout main
-          git pull upstream main
           
-          # Push updated main to our fork
+          # Fetch latest from upstream (official repo)
+          echo "🔄 Fetching latest changes from upstream official repo..."
+          git fetch upstream
+          
+          # Update our main branch with upstream changes
+          git checkout main
+          git merge upstream/main
+          
+          # Push updated main to our fork (origin)
+          echo "📤 Pushing updated main to our fork..."
           git push origin main
           
-          # Verify remotes after setup
-          echo "🔍 Final git remotes:"
+          # Verify final remote setup
+          echo "🔍 Final git remotes (origin=fork, upstream=official):"
           git remote -v
           
           # Create a new branch for the PR
