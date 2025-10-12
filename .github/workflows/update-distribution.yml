@@ -110,7 +110,7 @@ jobs:
           echo "🍺 Updating custom Homebrew tap..."
           
           # Clone the tap repository
-          git clone https://${{ secrets.HOMEBREW_TAP_TOKEN }}@github.com/risa-labs-inc/homebrew.git homebrew-tap
+          git clone https://${{ secrets.HOMEBREW_TAP_TOKEN }}@github.com/risa-labs-inc/homebrew-boss.git homebrew-tap
           cd homebrew-tap
           
           # Configure git
