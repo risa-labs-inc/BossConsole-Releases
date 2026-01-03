@@ -1,9 +1,9 @@
 # BOSS - Business OS + Simulator
 
-[![BOSS Version](https://img.shields.io/github/v/release/risa-labs-inc/BOSS-Releases.svg?label=BOSS&color=brightgreen)](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
-[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-blue.svg)](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
-[![License](https://img.shields.io/badge/license-Proprietary-red.svg)](https://github.com/risa-labs-inc/BOSS-Releases/blob/main/LICENSE)
-[![Downloads](https://img.shields.io/github/downloads/risa-labs-inc/BOSS-Releases/total.svg)](https://github.com/risa-labs-inc/BOSS-Releases/releases)
+[![BOSS Version](https://img.shields.io/github/v/release/risa-labs-inc/BossConsole-Releases.svg?label=BOSS&color=brightgreen)](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-blue.svg)](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest)
+[![License](https://img.shields.io/badge/license-Proprietary-red.svg)](https://github.com/risa-labs-inc/BossConsole-Releases/blob/main/LICENSE)
+[![Downloads](https://img.shields.io/github/downloads/risa-labs-inc/BossConsole-Releases/total.svg)](https://github.com/risa-labs-inc/BossConsole-Releases/releases)
 
 BOSS (Business OS + Simulator) is a sophisticated, AI-powered workspace designed for complex business operations, with specialized features for healthcare administration, workflow automation, and intelligent process management.
 
@@ -11,11 +11,11 @@ BOSS (Business OS + Simulator) is a sophisticated, AI-powered workspace designed
 
 | Platform | Download |
 |----------|----------|
-| **macOS (Universal)** | [🍺 Homebrew](https://formulae.brew.sh/cask/boss) \| [📦 Download DMG](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
-| **Windows (x64)** | [📦 Download MSI](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
-| **Linux (DEB)** | [📦 Download DEB](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
-| **Linux (RPM)** | [📦 Download RPM](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
-| **Linux (JAR)** | [📦 Download JAR](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest) |
+| **macOS (Universal)** | [🍺 Homebrew](https://formulae.brew.sh/cask/boss) \| [📦 Download DMG](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
+| **Windows (x64)** | [📦 Download MSI](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
+| **Linux (DEB)** | [📦 Download DEB](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
+| **Linux (RPM)** | [📦 Download RPM](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
+| **Linux (JAR)** | [📦 Download JAR](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
 
 > 💡 **Quick Install**: 
 > - **macOS**: `brew install --cask boss` or `brew install --cask risa-labs-inc/homebrew/boss`
@@ -127,12 +127,12 @@ brew upgrade --cask risa-labs-inc/homebrew/boss
 ```
 
 #### Option 2: Direct Download (DMG)
-1. Download the latest DMG file from [Releases](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
+1. Download the latest DMG file from [Releases](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest)
 2. Mount the DMG and drag BOSS to Applications
 3. Launch BOSS from Applications folder
 
 ### Windows (MSI)
-1. Download the latest MSI installer from [Releases](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
+1. Download the latest MSI installer from [Releases](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest)
 2. Run the installer with administrator privileges
 3. Launch BOSS from Start Menu or Desktop shortcut
 
@@ -144,7 +144,7 @@ brew upgrade --cask risa-labs-inc/homebrew/boss
 
 ```bash
 # Download latest DEB package
-wget $(curl -s https://api.github.com/repos/risa-labs-inc/BOSS-Releases/releases/latest | grep "browser_download_url.*\.deb" | cut -d '"' -f 4)
+wget $(curl -s https://api.github.com/repos/risa-labs-inc/BossConsole-Releases/releases/latest | grep "browser_download_url.*\.deb" | cut -d '"' -f 4)
 
 # Install
 sudo dpkg -i BOSS-*.deb
@@ -157,7 +157,7 @@ boss
 **Alternative: Direct download with specific version**
 ```bash
 # Download specific version (replace 8.11.3 with desired version)
-wget https://github.com/risa-labs-inc/BOSS-Releases/releases/download/v8.11.3/BOSS-8.11.3.deb
+wget https://github.com/risa-labs-inc/BossConsole-Releases/releases/download/v8.11.3/BOSS-8.11.3.deb
 sudo dpkg -i BOSS-8.11.3.deb
 sudo apt-get install -f
 ```
@@ -165,7 +165,7 @@ sudo apt-get install -f
 #### RHEL/Fedora/openSUSE (RPM Package)
 ```bash
 # Download latest RPM package
-wget $(curl -s https://api.github.com/repos/risa-labs-inc/BOSS-Releases/releases/latest | grep "browser_download_url.*\.rpm" | cut -d '"' -f 4)
+wget $(curl -s https://api.github.com/repos/risa-labs-inc/BossConsole-Releases/releases/latest | grep "browser_download_url.*\.rpm" | cut -d '"' -f 4)
 
 # Install
 sudo rpm -i BOSS-*.rpm
@@ -181,7 +181,7 @@ boss
 java -version
 
 # Download and run latest JAR
-wget $(curl -s https://api.github.com/repos/risa-labs-inc/BOSS-Releases/releases/latest | grep "browser_download_url.*\.jar" | cut -d '"' -f 4)
+wget $(curl -s https://api.github.com/repos/risa-labs-inc/BossConsole-Releases/releases/latest | grep "browser_download_url.*\.jar" | cut -d '"' -f 4)
 java -jar BOSS-*.jar
 ```
 
@@ -204,7 +204,7 @@ brew update && brew upgrade --cask boss
 ```
 
 **Direct Download Users**
-- Download the latest version from [Releases](https://github.com/risa-labs-inc/BOSS-Releases/releases/latest)
+- Download the latest version from [Releases](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest)
 - Install over existing installation (settings preserved)
 
 > **🍎 Apple Silicon Users**: Version 8.11.4 includes a critical fix for a crash that prevented BOSS from launching on Apple Silicon Macs. If you're experiencing startup crashes, please update to 8.11.4 or later immediately.
@@ -250,7 +250,7 @@ BOSS follows semantic versioning with regular updates including new features, pe
 - **UI/UX Improvements**: Enhanced user experience and interface refinements
 - **Bug Fixes**: Resolution of reported issues and stability improvements
 
-[View detailed release history and download previous versions →](https://github.com/risa-labs-inc/BOSS-Releases/releases)
+[View detailed release history and download previous versions →](https://github.com/risa-labs-inc/BossConsole-Releases/releases)
 
 ## 🏢 About Risa Labs
 

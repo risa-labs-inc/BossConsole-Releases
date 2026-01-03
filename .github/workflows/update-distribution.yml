@@ -40,7 +40,7 @@ jobs:
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             # Manual trigger - use input version
             VERSION="${{ github.event.inputs.version }}"
-            RELEASE_URL="https://github.com/risa-labs-inc/BOSS-Releases/releases/tag/v${VERSION}"
+            RELEASE_URL="https://github.com/risa-labs-inc/BossConsole-Releases/releases/tag/v${VERSION}"
             echo "🔧 Manual trigger for version: $VERSION"
             
             # Check if user wants to skip official PR
@@ -73,7 +73,7 @@ jobs:
           echo "RELEASE_URL=$RELEASE_URL" >> $GITHUB_OUTPUT
           echo "TRIGGER_TYPE=$TRIGGER_TYPE" >> $GITHUB_OUTPUT
           echo "ASSET_NAME=BOSS-${VERSION}-Universal.dmg" >> $GITHUB_OUTPUT
-          echo "DOWNLOAD_URL=https://github.com/risa-labs-inc/BOSS-Releases/releases/download/v${VERSION}/BOSS-${VERSION}-Universal.dmg" >> $GITHUB_OUTPUT
+          echo "DOWNLOAD_URL=https://github.com/risa-labs-inc/BossConsole-Releases/releases/download/v${VERSION}/BOSS-${VERSION}-Universal.dmg" >> $GITHUB_OUTPUT
           echo "PR_MESSAGE=${{ github.event.inputs.pr_message || '' }}" >> $GITHUB_OUTPUT
           echo "📦 Processing BOSS release $VERSION"
 
