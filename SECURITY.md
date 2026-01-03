@@ -194,7 +194,7 @@ BOSS security updates are released regularly with each version. Recent security 
 - **Dependency Updates**: Regular patching of third-party vulnerabilities
 - **Input Validation**: Enhanced protection against injection attacks
 
-[View detailed security changelog with version history →](https://github.com/risa-labs-inc/BOSS-Releases/releases)
+[View detailed security changelog with version history →](https://github.com/risa-labs-inc/BossConsole-Releases/releases)
 
 ## 🏆 Security Recognition
 
