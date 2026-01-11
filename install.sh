@@ -187,14 +187,28 @@ check_installed() {
 
 install_macos_dmg() {
     local version="$1"
-    local dmg_url="${GITHUB_RELEASE_URL}/v${version}/BOSS-${version}-Universal.dmg"
+    local arch
+    local dmg_suffix
+    local dmg_url
     local tmp_dmg
     local mount_point
 
-    info "Installing BOSS from DMG (version ${version})..."
+    # Detect macOS architecture
+    arch="$(uname -m)"
+    case "$arch" in
+        arm64)  dmg_suffix="arm64" ;;
+        x86_64) dmg_suffix="x64" ;;
+        *)      dmg_suffix="arm64" ;;  # Default to arm64 (works via Rosetta)
+    esac
+
+    dmg_url="${GITHUB_RELEASE_URL}/v${version}/BOSS-${version}-${dmg_suffix}.dmg"
+    local fallback_url="${GITHUB_RELEASE_URL}/v${version}/BOSS-${version}-Universal.dmg"
+
+    info "Installing BOSS from DMG (version ${version}, arch ${dmg_suffix})..."
 
     if [ "$DRY_RUN" = true ]; then
         info "[DRY-RUN] Would download: $dmg_url"
+        info "[DRY-RUN] Would fallback to: $fallback_url (if arch-specific not available)"
         info "[DRY-RUN] Would install to: $MACOS_APP_PATH"
         return 0
     fi
@@ -202,8 +216,12 @@ install_macos_dmg() {
     # Create temp file
     tmp_dmg=$(mktemp /tmp/BOSS-XXXXXX.dmg)
 
-    # Download DMG
-    download_file "$dmg_url" "$tmp_dmg"
+    # Try architecture-specific DMG first, fallback to Universal
+    if ! download_file "$dmg_url" "$tmp_dmg" 2>/dev/null; then
+        warn "Architecture-specific DMG not available, falling back to Universal..."
+        dmg_url="$fallback_url"
+        download_file "$dmg_url" "$tmp_dmg"
+    fi
 
     # Mount DMG
     info "Mounting DMG..."
