@@ -17,10 +17,15 @@ BOSS (Business OS + Simulator) is a sophisticated, AI-powered workspace designed
 | **Linux (RPM)** | [📦 Download RPM](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
 | **Linux (JAR)** | [📦 Download JAR](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
 
-> 💡 **Quick Install**: 
-> - **macOS**: `brew install --cask boss` or `brew install --cask risa-labs-inc/homebrew/boss`
-> - **Linux**: Download and install DEB/RPM packages directly (see installation guide below)
-> - **Windows**: Download MSI installer from releases
+> 💡 **Quick Install (Recommended)**:
+> ```bash
+> # macOS/Linux
+> curl -fsSL https://raw.githubusercontent.com/risa-labs-inc/BossConsole-Releases/main/install.sh | bash
+> ```
+> ```powershell
+> # Windows (PowerShell)
+> iwr -useb https://raw.githubusercontent.com/risa-labs-inc/BossConsole-Releases/main/install.ps1 | iex
+> ```
 
 ## 📋 What is BOSS?
 
@@ -100,48 +105,91 @@ BOSS includes optimized layouts for different roles:
 
 ## 📥 Installation
 
-### macOS
+### Universal Install Script (Recommended)
 
-#### Option 1: Homebrew (Recommended)
+The easiest way to install BOSS on any platform. The script automatically detects your OS and architecture.
 
-**For Latest Updates (Recommended)**
+#### macOS / Linux
+```bash
+curl -fsSL https://raw.githubusercontent.com/risa-labs-inc/BossConsole-Releases/main/install.sh | bash
+```
+
+**Options:**
+```bash
+# Install specific version
+curl -fsSL .../install.sh | bash -s -- --version 8.15.10
+
+# Dry run (preview without installing)
+curl -fsSL .../install.sh | bash -s -- --dry-run
+
+# Uninstall
+curl -fsSL .../install.sh | bash -s -- --uninstall
+```
+
+#### Windows (PowerShell)
+```powershell
+iwr -useb https://raw.githubusercontent.com/risa-labs-inc/BossConsole-Releases/main/install.ps1 | iex
+```
+
+**Options:**
+```powershell
+# Install specific version
+.\install.ps1 -Version 8.15.10
+
+# Dry run
+.\install.ps1 -DryRun
+
+# Uninstall
+.\install.ps1 -Uninstall
+```
+
+#### Windows (CMD)
+```batch
+curl -fsSL https://raw.githubusercontent.com/risa-labs-inc/BossConsole-Releases/main/install.bat -o install.bat && install.bat
+```
+
+---
+
+### Alternative Installation Methods
+
+<details>
+<summary><strong>macOS: Homebrew</strong></summary>
+
 ```bash
 # Add Risa Labs tap for fastest access to new releases
 brew tap risa-labs-inc/homebrew
 brew install --cask boss
-```
 
-**Official Homebrew Cask**
-```bash
-# Install from official Homebrew (may have slight delay for new releases)
+# Or from official Homebrew (may have slight delay for new releases)
 brew install --cask boss
-```
 
-**Upgrading BOSS**
-```bash
-# Update Homebrew database and upgrade BOSS to latest version
+# Upgrade
 brew update && brew upgrade --cask boss
-
-# For custom tap users
-brew upgrade --cask risa-labs-inc/homebrew/boss
 ```
+</details>
 
-#### Option 2: Direct Download (DMG)
+<details>
+<summary><strong>macOS: Direct Download (DMG)</strong></summary>
+
 1. Download the latest DMG file from [Releases](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest)
 2. Mount the DMG and drag BOSS to Applications
 3. Launch BOSS from Applications folder
+</details>
 
-### Windows (MSI)
+<details>
+<summary><strong>Windows: Direct Download (MSI)</strong></summary>
+
 1. Download the latest MSI installer from [Releases](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest)
 2. Run the installer with administrator privileges
 3. Launch BOSS from Start Menu or Desktop shortcut
+</details>
 
-### Linux
+<details>
+<summary><strong>Linux: Manual Package Installation</strong></summary>
 
-> **📝 Note**: BOSS packages are large (~250MB) and exceed GitHub's file size limits for APT repositories. We provide direct downloads from GitHub Releases instead, which is actually simpler and more reliable for large applications.
+> **📝 Note**: BOSS packages are large (~250MB) and exceed GitHub's file size limits for APT repositories. We provide direct downloads from GitHub Releases instead.
 
-#### Ubuntu/Debian (DEB Package)
-
+**Ubuntu/Debian (DEB Package)**
 ```bash
 # Download latest DEB package
 wget $(curl -s https://api.github.com/repos/risa-labs-inc/BossConsole-Releases/releases/latest | grep "browser_download_url.*\.deb" | cut -d '"' -f 4)
@@ -154,15 +202,7 @@ sudo apt-get install -f  # Fix any missing dependencies
 boss
 ```
 
-**Alternative: Direct download with specific version**
-```bash
-# Download specific version (replace 8.11.3 with desired version)
-wget https://github.com/risa-labs-inc/BossConsole-Releases/releases/download/v8.11.3/BOSS-8.11.3.deb
-sudo dpkg -i BOSS-8.11.3.deb
-sudo apt-get install -f
-```
-
-#### RHEL/Fedora/openSUSE (RPM Package)
+**RHEL/Fedora/openSUSE (RPM Package)**
 ```bash
 # Download latest RPM package
 wget $(curl -s https://api.github.com/repos/risa-labs-inc/BossConsole-Releases/releases/latest | grep "browser_download_url.*\.rpm" | cut -d '"' -f 4)
@@ -175,7 +215,7 @@ sudo rpm -i BOSS-*.rpm
 boss
 ```
 
-#### Universal Linux (JAR)
+**Universal Linux (JAR)**
 ```bash
 # Ensure Java 17+ is installed
 java -version
@@ -184,6 +224,7 @@ java -version
 wget $(curl -s https://api.github.com/repos/risa-labs-inc/BossConsole-Releases/releases/latest | grep "browser_download_url.*\.jar" | cut -d '"' -f 4)
 java -jar BOSS-*.jar
 ```
+</details>
 
 ## 🔄 Updates
 
