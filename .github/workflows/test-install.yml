@@ -1,0 +1,315 @@
+name: Test Install Scripts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'install.sh'
+      - 'install.ps1'
+      - 'install.bat'
+      - '.github/workflows/test-install.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'install.sh'
+      - 'install.ps1'
+      - 'install.bat'
+      - '.github/workflows/test-install.yml'
+  workflow_dispatch:
+    inputs:
+      run_real_install:
+        description: 'Run real installation tests (requires released packages)'
+        required: false
+        default: false
+        type: boolean
+  release:
+    types: [published]
+
+jobs:
+  # ============================================================================
+  # Static Analysis
+  # ============================================================================
+  shellcheck:
+    name: ShellCheck Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run ShellCheck on install.sh
+        run: |
+          sudo apt-get update && sudo apt-get install -y shellcheck
+          shellcheck -S warning install.sh
+
+      - name: Syntax Check
+        run: bash -n install.sh
+
+  # ============================================================================
+  # macOS Tests
+  # ============================================================================
+  test-macos:
+    name: macOS (DMG)
+    runs-on: macos-latest
+    needs: shellcheck
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test --help
+        run: ./install.sh --help
+
+      - name: Test platform detection (dry-run)
+        run: |
+          OUTPUT=$(./install.sh --dry-run --version 8.15.10 2>&1)
+          echo "$OUTPUT"
+          echo "$OUTPUT" | grep -q "darwin"
+
+      - name: Test install (real)
+        if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
+        run: ./install.sh
+
+      - name: Verify installation
+        if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
+        run: |
+          test -d /Applications/BOSS.app
+          echo "BOSS.app found in /Applications"
+
+      - name: Test uninstall
+        if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
+        run: echo "n" | ./install.sh --uninstall
+
+  # ============================================================================
+  # Ubuntu Tests (AMD64)
+  # ============================================================================
+  test-ubuntu:
+    name: Ubuntu AMD64 (DEB)
+    runs-on: ubuntu-latest
+    needs: shellcheck
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test platform detection (dry-run)
+        run: |
+          OUTPUT=$(./install.sh --dry-run --version 8.15.10 2>&1)
+          echo "$OUTPUT"
+          echo "$OUTPUT" | grep -q "linux"
+          echo "$OUTPUT" | grep -q "amd64"
+
+      - name: Test install (real)
+        if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
+        run: ./install.sh
+
+      - name: Verify installation
+        if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
+        run: |
+          dpkg -l boss || which boss
+          echo "Package installation verified"
+
+      - name: Test uninstall
+        if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
+        run: echo "n" | ./install.sh --uninstall
+
+  # ============================================================================
+  # Ubuntu Tests (ARM64)
+  # ============================================================================
+  test-ubuntu-arm:
+    name: Ubuntu ARM64 (DEB)
+    runs-on: ubuntu-24.04-arm
+    needs: shellcheck
+    continue-on-error: true  # ARM runners may not be available
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test platform detection (dry-run)
+        run: |
+          OUTPUT=$(./install.sh --dry-run --version 8.15.10 2>&1)
+          echo "$OUTPUT"
+          echo "$OUTPUT" | grep -q "linux"
+          echo "$OUTPUT" | grep -q "arm64"
+
+      - name: Test install (real)
+        if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
+        run: ./install.sh
+
+  # ============================================================================
+  # Fedora Tests (via container)
+  # ============================================================================
+  test-fedora:
+    name: Fedora 39 (RPM)
+    runs-on: ubuntu-latest
+    needs: shellcheck
+    container: fedora:39
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: dnf install -y curl which findutils
+
+      - name: Test platform detection (dry-run)
+        run: |
+          OUTPUT=$(./install.sh --dry-run --version 8.15.10 2>&1)
+          echo "$OUTPUT"
+          echo "$OUTPUT" | grep -q "linux"
+
+      - name: Test install (real)
+        if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
+        run: ./install.sh
+
+      - name: Verify installation
+        if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
+        run: rpm -q boss
+
+  # ============================================================================
+  # Debian Tests (via container)
+  # ============================================================================
+  test-debian:
+    name: Debian 12 (DEB)
+    runs-on: ubuntu-latest
+    needs: shellcheck
+    container: debian:12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: apt-get update && apt-get install -y curl ca-certificates
+
+      - name: Test platform detection (dry-run)
+        run: |
+          OUTPUT=$(./install.sh --dry-run --version 8.15.10 2>&1)
+          echo "$OUTPUT"
+          echo "$OUTPUT" | grep -q "linux"
+
+      - name: Test install (real)
+        if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
+        run: ./install.sh
+
+  # ============================================================================
+  # Edge Case Tests
+  # ============================================================================
+  test-edge-cases:
+    name: Edge Cases
+    runs-on: ubuntu-latest
+    needs: shellcheck
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test --help output
+        run: |
+          ./install.sh --help
+          ./install.sh --help | grep -q "BOSS"
+
+      - name: Test invalid option
+        run: |
+          ! ./install.sh --invalid-option 2>&1
+          echo "Invalid option correctly rejected"
+
+      - name: Test specific version (dry-run)
+        run: |
+          OUTPUT=$(./install.sh --dry-run --version 8.15.10 2>&1)
+          echo "$OUTPUT"
+          echo "$OUTPUT" | grep -q "8.15.10"
+
+  # ============================================================================
+  # Windows Tests (PowerShell)
+  # ============================================================================
+  test-windows-ps:
+    name: Windows (PowerShell)
+    runs-on: windows-latest
+    needs: shellcheck
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test -Help
+        run: .\install.ps1 -Help
+        shell: pwsh
+
+      - name: Test platform detection (dry-run)
+        run: |
+          .\install.ps1 -DryRun -Version 8.15.10
+        shell: pwsh
+
+      - name: Test install (real)
+        if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
+        run: .\install.ps1
+        shell: pwsh
+
+      - name: Verify installation
+        if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
+        run: |
+          # Check if BOSS is installed via registry
+          $installed = Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" -ErrorAction SilentlyContinue |
+            Where-Object { $_.DisplayName -like "*BOSS*" }
+          if ($installed) {
+            Write-Host "BOSS installation verified"
+          } else {
+            throw "BOSS not found in installed programs"
+          }
+        shell: pwsh
+
+      - name: Test uninstall
+        if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
+        run: echo "n" | .\install.ps1 -Uninstall
+        shell: pwsh
+
+  # ============================================================================
+  # Windows Tests (Batch)
+  # ============================================================================
+  test-windows-bat:
+    name: Windows (Batch)
+    runs-on: windows-latest
+    needs: shellcheck
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test /help
+        run: install.bat /help
+        shell: cmd
+
+      - name: Test /dryrun
+        run: |
+          install.bat /dryrun /version:8.15.10
+        shell: cmd
+
+      - name: Test install (real)
+        if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
+        run: install.bat
+        shell: cmd
+
+  # ============================================================================
+  # Summary
+  # ============================================================================
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [shellcheck, test-macos, test-ubuntu, test-fedora, test-debian, test-windows-ps, test-windows-bat, test-edge-cases]
+    if: always()
+    steps:
+      - name: Check Results
+        run: |
+          echo "## Install Script Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| ShellCheck | ${{ needs.shellcheck.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| macOS | ${{ needs.test-macos.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Ubuntu AMD64 | ${{ needs.test-ubuntu.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Fedora | ${{ needs.test-fedora.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Debian | ${{ needs.test-debian.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Windows (PS) | ${{ needs.test-windows-ps.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Windows (BAT) | ${{ needs.test-windows-bat.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Edge Cases | ${{ needs.test-edge-cases.result }} |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Fail if critical tests failed
+        if: |
+          needs.shellcheck.result == 'failure' ||
+          needs.test-macos.result == 'failure' ||
+          needs.test-ubuntu.result == 'failure' ||
+          needs.test-windows-ps.result == 'failure'
+        run: exit 1
