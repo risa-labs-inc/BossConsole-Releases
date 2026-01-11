@@ -39,9 +39,10 @@ if /i "%~1"=="/dryrun" (
     shift
     goto :parse_args
 )
-if /i "%~1:~0,9%"=="/version:" (
-    set "VERSION=%~1"
-    set "VERSION=!VERSION:~9!"
+:: Check for /version: prefix
+set "ARG=%~1"
+if /i "!ARG:~0,9!"=="/version:" (
+    set "VERSION=!ARG:~9!"
     shift
     goto :parse_args
 )
