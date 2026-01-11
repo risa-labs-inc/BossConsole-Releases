@@ -9,13 +9,12 @@ BOSS (Business OS + Simulator) is a sophisticated, AI-powered workspace designed
 
 ## 🚀 Latest Release
 
-| Platform | Download |
-|----------|----------|
-| **macOS (Universal)** | [🍺 Homebrew](https://formulae.brew.sh/cask/boss) \| [📦 Download DMG](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
-| **Windows (x64)** | [📦 Download MSI](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
-| **Linux (DEB)** | [📦 Download DEB](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
-| **Linux (RPM)** | [📦 Download RPM](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
-| **Linux (JAR)** | [📦 Download JAR](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
+| Platform | Architecture | Download |
+|----------|--------------|----------|
+| **macOS** | Universal (Apple Silicon + Intel) | [🍺 Homebrew](https://formulae.brew.sh/cask/boss) \| [📦 DMG](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
+| **Windows** | x64 | [📦 MSI](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
+| **Windows** | ARM64 | [📦 MSI](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
+| **Linux** | AMD64 / ARM64 | [📦 DEB](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) \| [📦 RPM](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) \| [📦 JAR](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
 
 > 💡 **Quick Install (Recommended)**:
 > ```bash
@@ -85,7 +84,7 @@ BOSS includes optimized layouts for different roles:
 
 ### macOS
 - **OS**: macOS 11.0 (Big Sur) or later
-- **Architecture**: Universal (Apple Silicon + Intel)
+- **Architecture**: Universal (Apple Silicon native, Intel via Rosetta 2)
 - **Memory**: 4 GB RAM minimum, 8 GB recommended
 - **Storage**: 500 MB available space
 
@@ -99,7 +98,7 @@ BOSS includes optimized layouts for different roles:
 - **DEB Package**: Ubuntu 18.04+ / Debian 10+ / Linux Mint 19+
 - **RPM Package**: RHEL 8+ / Fedora 30+ / openSUSE 15+ / CentOS 8+
 - **JAR Package**: Any Linux distribution with Java 17+
-- **Architecture**: x86_64 (64-bit)
+- **Architecture**: AMD64 (x86_64) and ARM64 (aarch64)
 - **Memory**: 4 GB RAM minimum, 8 GB recommended
 - **Storage**: 500 MB available space
 
