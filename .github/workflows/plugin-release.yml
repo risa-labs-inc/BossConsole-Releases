@@ -1,0 +1,65 @@
+name: Plugin Release
+
+on:
+  workflow_call:
+    secrets:
+      BOSS_STORE_PLUGIN_PUBLISH_KEY:
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build plugin
+        run: ./gradlew build
+
+      - name: Extract version
+        id: version
+        run: |
+          VERSION=$(grep "^version" build.gradle.kts | sed 's/version = "\(.*\)"/\1/')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Delete existing release
+        run: gh release delete "v${{ steps.version.outputs.version }}" --yes || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/libs/*.jar
+          generate_release_notes: true
+          name: v${{ steps.version.outputs.version }}
+          tag_name: v${{ steps.version.outputs.version }}
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to BOSS Plugin Store
+        run: |
+          echo "Publishing to BOSS Plugin Store..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+            "https://api.risaboss.com/functions/v1/plugin-store/github" \
+            -H "Content-Type: application/json" \
+            -H "X-API-Key: ${{ secrets.BOSS_STORE_PLUGIN_PUBLISH_KEY }}" \
+            -d "{\"githubUrl\": \"${{ github.server_url }}/${{ github.repository }}\"}")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | head -n-1)
+          echo "Response: $BODY"
+          if [ "$HTTP_CODE" -ge 400 ]; then
+            echo "::error::Failed to publish to BOSS Store (HTTP $HTTP_CODE)"
+            exit 1
+          fi
+          echo "✅ Successfully published to BOSS Plugin Store"
