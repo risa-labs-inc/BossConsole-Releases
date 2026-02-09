@@ -2,6 +2,12 @@ name: Plugin Release
 
 on:
   workflow_call:
+    inputs:
+      boss_plugin_api_version:
+        description: 'Version of boss-plugin-api to download (e.g., "1.0.17"). If empty, no download is performed.'
+        required: false
+        type: string
+        default: ''
     secrets:
       BOSS_STORE_PLUGIN_PUBLISH_KEY:
         required: true
@@ -21,6 +27,14 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
+
+      - name: Download boss-plugin-api
+        if: inputs.boss_plugin_api_version != ''
+        run: |
+          mkdir -p build/downloaded-deps
+          curl -sL -o build/downloaded-deps/boss-plugin-api.jar \
+            "https://github.com/risa-labs-inc/boss-plugin-api/releases/download/v${{ inputs.boss_plugin_api_version }}/boss-plugin-api-${{ inputs.boss_plugin_api_version }}.jar"
+          ls -la build/downloaded-deps/
 
       - name: Build plugin
         run: ./gradlew build
