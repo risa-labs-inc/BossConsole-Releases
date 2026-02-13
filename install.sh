@@ -207,7 +207,7 @@ install_macos_dmg() {
 
     # Mount DMG
     info "Mounting DMG..."
-    mount_point=$(hdiutil attach "$tmp_dmg" -nobrowse -noautoopen | grep "/Volumes/" | awk '{print $NF}')
+    mount_point=$(hdiutil attach "$tmp_dmg" -nobrowse -noautoopen | grep "/Volumes/" | sed 's/.*\/Volumes/\/Volumes/')
 
     if [ -z "$mount_point" ]; then
         error "Failed to mount DMG"
