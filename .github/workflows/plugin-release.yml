@@ -11,6 +11,8 @@ on:
     secrets:
       BOSS_STORE_PLUGIN_PUBLISH_KEY:
         required: true
+      SUPABASE_ANON_KEY:
+        required: false
 
 jobs:
   release:
@@ -38,6 +40,8 @@ jobs:
 
       - name: Build plugin
         run: ./gradlew build
+        env:
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
       - name: Extract version
         id: version
