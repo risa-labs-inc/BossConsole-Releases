@@ -4,10 +4,10 @@ on:
   workflow_call:
     inputs:
       boss_plugin_api_version:
-        description: 'Version of boss-plugin-api to download (e.g., "1.0.17"). If empty, no download is performed.'
+        description: 'Version of boss-plugin-api: "latest" (default) auto-fetches newest release, specific version like "1.0.36", or "none" to skip.'
         required: false
         type: string
-        default: ''
+        default: 'latest'
       version_increment:
         description: 'Version increment type: patch, minor, major, or none to skip bumping.'
         required: false
@@ -60,11 +60,20 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Download boss-plugin-api
-        if: inputs.boss_plugin_api_version != ''
+        if: inputs.boss_plugin_api_version != 'none' && inputs.boss_plugin_api_version != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p build/downloaded-deps
+          API_VERSION="${{ inputs.boss_plugin_api_version }}"
+          if [ "$API_VERSION" = "latest" ]; then
+            # Auto-resolve latest release version
+            API_VERSION=$(gh api repos/risa-labs-inc/boss-plugin-api/releases/latest --jq '.tag_name' | sed 's/^v//')
+            echo "Resolved latest boss-plugin-api version: $API_VERSION"
+          fi
           curl -sL -o build/downloaded-deps/boss-plugin-api.jar \
-            "https://github.com/risa-labs-inc/boss-plugin-api/releases/download/v${{ inputs.boss_plugin_api_version }}/boss-plugin-api-${{ inputs.boss_plugin_api_version }}.jar"
+            "https://github.com/risa-labs-inc/boss-plugin-api/releases/download/v${API_VERSION}/boss-plugin-api-${API_VERSION}.jar"
+          echo "Downloaded boss-plugin-api v${API_VERSION}"
           ls -la build/downloaded-deps/
 
       - name: Build plugin
