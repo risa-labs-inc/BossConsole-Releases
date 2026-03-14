@@ -114,14 +114,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to BOSS Plugin Store
-        # Non-fatal: the runtime JAR (~95 MB) exceeds edge function memory limits.
-        # System plugins are auto-downloaded from GitHub releases by PluginStoreSetup,
-        # so store registration is optional.
-        continue-on-error: true
         run: |
-          echo "Publishing to BOSS Plugin Store..."
+          echo "Publishing to BOSS Plugin Store (metadata-only for large JAR)..."
           RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
-            "https://api.risaboss.com/functions/v1/plugin-store/github" \
+            "https://api.risaboss.com/functions/v1/plugin-store/github/metadata" \
             -H "Content-Type: application/json" \
             -H "X-API-Key: ${{ secrets.BOSS_STORE_PLUGIN_PUBLISH_KEY }}" \
             -d "{\"githubUrl\": \"${{ github.server_url }}/${{ github.repository }}\"}")
@@ -129,7 +125,7 @@ jobs:
           BODY=$(echo "$RESPONSE" | head -n-1)
           echo "Response: $BODY"
           if [ "$HTTP_CODE" -ge 400 ]; then
-            echo "::warning::Store publish skipped (HTTP $HTTP_CODE) — system plugin auto-downloads from GitHub releases"
-          else
-            echo "✅ Successfully published to BOSS Plugin Store"
+            echo "::error::Failed to publish to BOSS Store (HTTP $HTTP_CODE)"
+            exit 1
           fi
+          echo "✅ Successfully published to BOSS Plugin Store"
