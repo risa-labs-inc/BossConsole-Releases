@@ -70,7 +70,10 @@ jobs:
 
       - name: Build fat JAR from BossConsole
         working-directory: BossConsole
-        run: ./gradlew :boss-microkernel-runtime:fatJar --no-daemon
+        run: |
+          # Try new module name first, fall back to old name
+          ./gradlew :boss-microkernel-runtime:fatJar --no-daemon 2>/dev/null \
+            || ./gradlew :boss-plugin-runtime:fatJar --no-daemon
 
       - name: Extract version
         id: version
@@ -82,7 +85,7 @@ jobs:
 
       - name: Prepare release artifact
         run: |
-          FAT_JAR=$(find BossConsole/boss-microkernel-runtime/build/libs -name "*-all.jar" | head -1)
+          FAT_JAR=$(find BossConsole/boss-microkernel-runtime/build/libs BossConsole/boss-plugin-runtime/build/libs -name "*-all.jar" 2>/dev/null | head -1)
           if [ -z "$FAT_JAR" ]; then
             echo "ERROR: Fat JAR not found in build output"
             exit 1
