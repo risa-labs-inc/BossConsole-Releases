@@ -1,0 +1,128 @@
+name: Microkernel Runtime Release
+
+on:
+  workflow_call:
+    inputs:
+      bossconsole_ref:
+        description: 'BossConsole ref to build from (branch, tag, or SHA)'
+        required: false
+        type: string
+        default: 'main'
+      version_increment:
+        description: 'Version increment type: patch, minor, major, or none to skip bumping.'
+        required: false
+        type: string
+        default: 'patch'
+    secrets:
+      BOSS_REPO_ACCESS_TOKEN:
+        required: true
+      BOSS_STORE_PLUGIN_PUBLISH_KEY:
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump version in plugin.json
+        if: inputs.version_increment != 'none'
+        run: |
+          MANIFEST="src/main/resources/META-INF/boss-plugin/plugin.json"
+          CURRENT=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' "$MANIFEST" | grep -o '"[^"]*"$' | tr -d '"')
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+
+          case "${{ inputs.version_increment }}" in
+            patch) PATCH=$((PATCH + 1)) ;;
+            minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
+            major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
+          esac
+
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          echo "Bumping version: $CURRENT -> $NEW_VERSION"
+          sed -i "s/\"version\"[[:space:]]*:[[:space:]]*\"[^\"]*\"/\"version\": \"${NEW_VERSION}\"/" "$MANIFEST"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "$MANIFEST"
+          git commit -m "🔖 Bump version to ${NEW_VERSION} [skip ci]"
+          git push
+
+      - name: Checkout BossConsole monorepo
+        uses: actions/checkout@v4
+        with:
+          repository: risa-labs-inc/BossConsole
+          ref: ${{ inputs.bossconsole_ref || 'main' }}
+          path: BossConsole
+          token: ${{ secrets.BOSS_REPO_ACCESS_TOKEN }}
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build fat JAR from BossConsole
+        working-directory: BossConsole
+        run: ./gradlew :boss-microkernel-runtime:fatJar --no-daemon
+
+      - name: Extract version
+        id: version
+        run: |
+          MANIFEST="src/main/resources/META-INF/boss-plugin/plugin.json"
+          VERSION=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' "$MANIFEST" | grep -o '"[^"]*"$' | tr -d '"')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Microkernel runtime version: $VERSION"
+
+      - name: Prepare release artifact
+        run: |
+          FAT_JAR=$(find BossConsole/boss-microkernel-runtime/build/libs -name "*-all.jar" | head -1)
+          if [ -z "$FAT_JAR" ]; then
+            echo "ERROR: Fat JAR not found in build output"
+            exit 1
+          fi
+          mkdir -p build/libs
+          DEST="build/libs/boss-microkernel-runtime-${{ steps.version.outputs.version }}-all.jar"
+          cp "$FAT_JAR" "$DEST"
+          # Inject plugin.json manifest from this repo into the JAR
+          jar uf "$DEST" -C src/main/resources META-INF/boss-plugin/plugin.json
+          echo "Built artifact: $DEST ($(du -h "$DEST" | cut -f1))"
+
+      - name: Delete existing release
+        run: gh release delete "v${{ steps.version.outputs.version }}" --yes || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/libs/*.jar
+          generate_release_notes: true
+          name: v${{ steps.version.outputs.version }}
+          tag_name: v${{ steps.version.outputs.version }}
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to BOSS Plugin Store
+        run: |
+          echo "Publishing to BOSS Plugin Store..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+            "https://api.risaboss.com/functions/v1/plugin-store/github" \
+            -H "Content-Type: application/json" \
+            -H "X-API-Key: ${{ secrets.BOSS_STORE_PLUGIN_PUBLISH_KEY }}" \
+            -d "{\"githubUrl\": \"${{ github.server_url }}/${{ github.repository }}\"}")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | head -n-1)
+          echo "Response: $BODY"
+          if [ "$HTTP_CODE" -ge 400 ]; then
+            echo "::error::Failed to publish to BOSS Store (HTTP $HTTP_CODE)"
+            exit 1
+          fi
+          echo "✅ Successfully published to BOSS Plugin Store"
