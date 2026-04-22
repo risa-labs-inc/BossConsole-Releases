@@ -116,42 +116,22 @@ jobs:
       - name: Publish to BOSS Plugin Store
         run: |
           echo "Publishing to BOSS Plugin Store (metadata-only)..."
-          # Extract manifest from the local JAR
-          MANIFEST_JSON=$(unzip -p build/libs/*.jar META-INF/boss-plugin/plugin.json)
-          JAR_SIZE=$(stat -c%s build/libs/*.jar 2>/dev/null || stat -f%z build/libs/*.jar)
-
-          # Build the request payload with manifest fields
-          PLUGIN_ID=$(echo "$MANIFEST_JSON" | jq -r '.pluginId')
-          DISPLAY_NAME=$(echo "$MANIFEST_JSON" | jq -r '.displayName')
-          VERSION=$(echo "$MANIFEST_JSON" | jq -r '.version')
-          API_VERSION=$(echo "$MANIFEST_JSON" | jq -r '.apiVersion // "1.0.0"')
-          MAIN_CLASS=$(echo "$MANIFEST_JSON" | jq -r '.mainClass // ""')
-          TYPE=$(echo "$MANIFEST_JSON" | jq -r '.type // "panel"')
-          DESCRIPTION=$(echo "$MANIFEST_JSON" | jq -r '.description // ""')
+          # The /github/metadata endpoint now extracts the manifest server-side
+          # from the JAR on GitHub (authoritative), and requires the publisher
+          # to supply the SHA-256 as a sanity check against server-side
+          # streaming recomputation. So all we need to send is the GitHub URL
+          # and the hash — no manifest payload.
+          JAR_PATH=$(ls build/libs/*.jar | head -1)
+          SHA256=$(sha256sum "$JAR_PATH" | awk '{print $1}')
 
           PAYLOAD=$(jq -n \
             --arg url "${{ github.server_url }}/${{ github.repository }}" \
-            --arg pid "$PLUGIN_ID" \
-            --arg dn "$DISPLAY_NAME" \
-            --arg ver "$VERSION" \
-            --arg api "$API_VERSION" \
-            --arg mc "$MAIN_CLASS" \
-            --arg tp "$TYPE" \
-            --arg desc "$DESCRIPTION" \
-            --argjson size "$JAR_SIZE" \
-            '{
-              githubUrl: $url,
-              manifest: {
-                pluginId: $pid,
-                displayName: $dn,
-                version: $ver,
-                apiVersion: $api,
-                mainClass: $mc,
-                type: $tp,
-                description: $desc
-              },
-              jarSize: $size
-            }')
+            --arg sha256 "$SHA256" \
+            '{ githubUrl: $url, sha256: $sha256 }')
+
+          # GitHub's release asset API is eventually consistent; give it a
+          # moment before the server tries to range-request the JAR.
+          sleep 5
 
           RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
             "https://api.risaboss.com/functions/v1/plugin-store/github/metadata" \
