@@ -106,8 +106,20 @@ jobs:
       - name: Publish to BOSS Plugin Store
         run: |
           echo "Publishing to BOSS Plugin Store..."
+          # /github buffers the JAR server-side and rejects assets over 50 MB;
+          # /github/metadata streams the hash from the GitHub release instead.
+          # Pick by the built JAR's size — plugins that bundle heavy deps
+          # (editor-tab ships BossEditor + the embedded Kotlin compiler, ~65 MB)
+          # exceed the buffered limit. Max size across jars in case a module
+          # also emits a small classified jar.
+          JAR_SIZE=$(stat -c%s build/libs/*.jar | sort -rn | head -n1)
+          ENDPOINT="github"
+          if [ "$JAR_SIZE" -gt 52428800 ]; then
+            ENDPOINT="github/metadata"
+          fi
+          echo "Largest JAR: ${JAR_SIZE} bytes -> POST /${ENDPOINT}"
           RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
-            "https://api.risaboss.com/functions/v1/plugin-store/github" \
+            "https://api.risaboss.com/functions/v1/plugin-store/${ENDPOINT}" \
             -H "Content-Type: application/json" \
             -H "X-API-Key: ${{ secrets.BOSS_STORE_PLUGIN_PUBLISH_KEY }}" \
             -d "{\"githubUrl\": \"${{ github.server_url }}/${{ github.repository }}\"}")
