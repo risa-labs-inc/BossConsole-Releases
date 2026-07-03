@@ -120,6 +120,25 @@ has_sudo() {
     return 1
 }
 
+is_root() {
+    [ "$(id -u)" -eq 0 ]
+}
+
+# True when we can run commands as root, either directly or via sudo.
+# Containers and minimal servers often run as root without sudo installed.
+has_root_access() {
+    is_root || has_sudo
+}
+
+# Run a command as root: directly when already root, via sudo otherwise.
+as_root() {
+    if is_root; then
+        "$@"
+    else
+        sudo "$@"
+    fi
+}
+
 # ============================================================================
 # Version Management
 # ============================================================================
@@ -260,11 +279,11 @@ install_linux_deb() {
 
     # Install
     info "Installing package..."
-    if has_sudo; then
-        sudo dpkg -i "$tmp_deb" || true
-        sudo apt-get install -f -y
+    if has_root_access; then
+        as_root dpkg -i "$tmp_deb" || true
+        as_root apt-get install -f -y
     else
-        error "sudo is required to install Deb packages"
+        error "root privileges (or sudo) are required to install Deb packages"
         rm -f "$tmp_deb"
         exit 1
     fi
@@ -310,16 +329,16 @@ install_linux_rpm() {
 
     # Install
     info "Installing package..."
-    if has_sudo; then
+    if has_root_access; then
         if has_command dnf; then
-            sudo dnf install -y "$tmp_rpm"
+            as_root dnf install -y "$tmp_rpm"
         elif has_command yum; then
-            sudo yum install -y "$tmp_rpm"
+            as_root yum install -y "$tmp_rpm"
         else
-            sudo rpm -i "$tmp_rpm"
+            as_root rpm -i "$tmp_rpm"
         fi
     else
-        error "sudo is required to install RPM packages"
+        error "root privileges (or sudo) are required to install RPM packages"
         rm -f "$tmp_rpm"
         exit 1
     fi
@@ -374,7 +393,7 @@ install_cli() {
     info "Installing CLI launcher..."
 
     # Determine installation path
-    if [ -w "/usr/local/bin" ] || has_sudo; then
+    if [ -w "/usr/local/bin" ] || has_root_access; then
         install_path="$CLI_SYSTEM_PATH"
     else
         install_path="$CLI_USER_PATH"
@@ -402,8 +421,8 @@ open -a BOSS "$@"'
     esac
 
     if [ "$install_path" = "$CLI_SYSTEM_PATH" ] && ! [ -w "/usr/local/bin" ]; then
-        echo "$launcher_content" | sudo tee "$install_path" > /dev/null
-        sudo chmod +x "$install_path"
+        echo "$launcher_content" | as_root tee "$install_path" > /dev/null
+        as_root chmod +x "$install_path"
     else
         echo "$launcher_content" > "$install_path"
         chmod +x "$install_path"
@@ -440,10 +459,10 @@ uninstall() {
             ;;
         linux)
             if dpkg -l boss >/dev/null 2>&1; then
-                sudo dpkg -r boss
+                as_root dpkg -r boss
                 success "Removed BOSS deb package"
             elif rpm -q boss >/dev/null 2>&1; then
-                sudo rpm -e boss
+                as_root rpm -e boss
                 success "Removed BOSS rpm package"
             fi
             ;;
@@ -451,8 +470,8 @@ uninstall() {
 
     # Remove CLI
     if [ -f "$CLI_SYSTEM_PATH" ]; then
-        if has_sudo; then
-            sudo rm -f "$CLI_SYSTEM_PATH"
+        if has_root_access; then
+            as_root rm -f "$CLI_SYSTEM_PATH"
         else
             rm -f "$CLI_SYSTEM_PATH"
         fi
