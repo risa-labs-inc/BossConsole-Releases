@@ -106,23 +106,27 @@ jobs:
       - name: Publish to BOSS Plugin Store
         run: |
           echo "Publishing to BOSS Plugin Store..."
-          # /github buffers the JAR server-side and rejects assets over 50 MB;
-          # /github/metadata streams the hash from the GitHub release instead.
-          # Pick by the built JAR's size — plugins that bundle heavy deps
-          # (editor-tab ships BossEditor + the embedded Kotlin compiler, ~65 MB)
-          # exceed the buffered limit. Max size across jars in case a module
-          # also emits a small classified jar.
-          JAR_SIZE=$(stat -c%s build/libs/*.jar | sort -rn | head -n1)
+          # /github buffers the JAR server-side and rejects assets over 50 MB.
+          # Larger JARs go to /github/metadata, whose contract requires the
+          # publisher to supply the JAR's SHA-256 (the server never downloads
+          # the JAR on that path; clients verify downloads against this hash).
+          # The largest jar in build/libs is the one uploaded to the release,
+          # so hashing it here hashes the exact released bytes.
+          JAR_FILE=$(ls -S build/libs/*.jar | head -n1)
+          JAR_SIZE=$(stat -c%s "$JAR_FILE")
           ENDPOINT="github"
+          BODY="{\"githubUrl\": \"${{ github.server_url }}/${{ github.repository }}\"}"
           if [ "$JAR_SIZE" -gt 52428800 ]; then
             ENDPOINT="github/metadata"
+            SHA256=$(sha256sum "$JAR_FILE" | cut -d' ' -f1)
+            BODY="{\"githubUrl\": \"${{ github.server_url }}/${{ github.repository }}\", \"sha256\": \"$SHA256\"}"
           fi
-          echo "Largest JAR: ${JAR_SIZE} bytes -> POST /${ENDPOINT}"
+          echo "JAR: $JAR_FILE (${JAR_SIZE} bytes) -> POST /${ENDPOINT}"
           RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
             "https://api.risaboss.com/functions/v1/plugin-store/${ENDPOINT}" \
             -H "Content-Type: application/json" \
             -H "X-API-Key: ${{ secrets.BOSS_STORE_PLUGIN_PUBLISH_KEY }}" \
-            -d "{\"githubUrl\": \"${{ github.server_url }}/${{ github.repository }}\"}")
+            -d "$BODY")
           HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
           BODY=$(echo "$RESPONSE" | head -n-1)
           echo "Response: $BODY"
