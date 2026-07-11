@@ -1,0 +1,67 @@
+name: Plugin Claude Review
+
+# Shared Claude Code review workflow for BOSS plugin repos.
+# Called from each plugin's .github/workflows/claude-code-review.yml.
+# Skips gracefully (green, with a notice) when ANTHROPIC_API_KEY is not
+# available, so repos without the secret don't fail their PR checks.
+
+on:
+  workflow_call:
+    secrets:
+      ANTHROPIC_API_KEY:
+        required: false
+        description: Anthropic API key. If absent, the review is skipped.
+
+jobs:
+  claude-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
+
+    steps:
+      - name: Check for API key
+        id: key
+        env:
+          HAS_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+        run: |
+          echo "present=$HAS_KEY" >> "$GITHUB_OUTPUT"
+          if [ "$HAS_KEY" != "true" ]; then
+            echo "::notice::ANTHROPIC_API_KEY is not configured for this repository — skipping Claude review. Set it as a repo or org secret to enable reviews."
+          fi
+
+      - name: Checkout repository
+        if: steps.key.outputs.present == 'true'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Review
+        if: steps.key.outputs.present == 'true'
+        id: claude-review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            This repository is a BOSS dynamic plugin (or the plugin API). Review this pull request and provide feedback on:
+            - Code quality and best practices
+            - Potential bugs or issues
+            - Performance considerations
+            - Security concerns
+            - Test coverage
+            - BOSS plugin conventions: Compose Multiplatform APIs only (not Android),
+              null-safe access to PluginContext providers (never crash on a null provider),
+              version changed only in build.gradle.kts (plugin.json is synced at build time),
+              and all Kotlin files ending with a newline.
+
+            Use the repository's CLAUDE.md for guidance on style and conventions. Be constructive and helpful in your feedback.
+
+            Use `gh pr comment` with your Bash tool to leave your review as a comment on the PR.
+
+          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
+          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
