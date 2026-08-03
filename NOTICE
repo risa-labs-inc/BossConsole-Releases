@@ -1,0 +1,136 @@
+BOSS — Business OS + Simulator
+Copyright 2025-2026 Risa Labs Inc.
+
+The BOSS source code is licensed under the Apache License, Version 2.0. A copy
+of that license is in the LICENSE file alongside this notice, and the source is
+published at https://github.com/risa-labs-inc/BossConsole.
+
+IMPORTANT: the installers distributed from this repository are not pure
+Apache-2.0 artifacts. They embed a Java runtime, a commercial browser library,
+and third-party open-source components, each of which remains under its own
+license. The Apache-2.0 grant in LICENSE covers Risa Labs' own code — it does
+not extend to the components listed below, and nothing in this notice grants
+rights beyond what those upstream licenses allow.
+
+
+===============================================================================
+1. Not open source — redistribution is restricted
+===============================================================================
+
+JxBrowser 9.3.0
+  Copyright TeamDev Ltd. Commercial license; NOT open source.
+  BOSS bundles the JxBrowser Java library and calls it under a commercial
+  license held by Risa Labs Inc. That license covers this distribution of
+  BOSS. It does NOT grant you the right to extract, reuse, or redistribute
+  JxBrowser outside BOSS, and it does not transfer to you as a recipient.
+  Using JxBrowser in your own product requires your own license from TeamDev.
+  https://www.teamdev.com/jxbrowser-licensing
+
+
+===============================================================================
+2. Copyleft and dual-licensed components
+===============================================================================
+
+Eclipse Temurin JRE 17 (Adoptium)
+  GNU General Public License, version 2, WITH the Classpath Exception.
+  The installers are built with jpackage and embed a Java runtime image. The
+  Classpath Exception is what permits BOSS's own code to remain under
+  Apache-2.0 while linking against this runtime; it does not relax the GPL
+  terms of the runtime itself.
+  https://adoptium.net/temurin/  |  https://openjdk.org/legal/gplv2+ce.html
+
+BossEditor (com.risaboss:bosseditor-compose-desktop)
+  GNU Lesser General Public License, version 3.0.
+  Copyright Risa Labs Inc. Bundled and linked as a library. LGPL-3.0 entitles
+  you to the library's source and to relink BOSS against a modified version.
+  Complete source: https://github.com/risa-labs-inc/BossEditor
+
+BossTerm (com.risaboss:bossterm-compose)
+  Dual-licensed: LGPLv3 OR Apache-2.0. Used here under Apache-2.0.
+  Copyright the BossTerm authors. Bundled inside the terminal-tab plugin.
+  Because upstream offers Apache-2.0 as an alternative, no LGPL relinking
+  obligation attaches to this distribution. You may take it under either
+  license.
+  Complete source: https://github.com/kshivang/BossTerm
+
+Java Native Access (JNA) 5.19.1
+  Dual-licensed: LGPL-2.1-or-later OR Apache-2.0. Used here under Apache-2.0.
+  https://github.com/java-native-access/jna
+
+Logback 1.5.38
+  Dual-licensed: Eclipse Public License 1.0 OR LGPL-2.1. Used here under
+  EPL-1.0. Copyright QOS.ch.
+  https://logback.qos.ch/license.html
+
+
+===============================================================================
+3. Downloaded after installation
+===============================================================================
+
+Chromium (distributed as "boss-chromium")
+  BSD-3-Clause, plus the additional licenses enumerated in Chromium's own
+  credits. Copyright The Chromium Authors and others.
+  Chromium binaries are deliberately NOT bundled in the installers; BOSS
+  fetches a branded engine build on first launch into ~/.boss/boss-chromium.
+  The engine is therefore not covered by this repository's LICENSE, and its
+  own terms govern it. Full per-component credits are viewable from the
+  running engine at chrome://credits.
+  https://www.chromium.org/  |  https://chromium.googlesource.com/chromium/src/+/main/LICENSE
+
+
+===============================================================================
+4. Permissive components
+===============================================================================
+
+MIT License
+  SLF4J 2.0.18 — Copyright QOS.ch Sarl
+  supabase-kt 3.6.0 — Copyright the supabase-kt contributors
+  PreCompose 1.6.2 — Copyright Tlaster
+  compose-icons 1.1.1 — Copyright devsrsouza and contributors. The wrapper
+    library is MIT; each bundled icon set carries its own upstream terms,
+    including Font Awesome Free (CC BY 4.0 icons, SIL OFL 1.1 fonts, MIT
+    code), Simple Icons (CC0-1.0), and Feather (MIT).
+
+BSD 3-Clause License
+  Protocol Buffers 4.35.1 — Copyright Google LLC
+
+Apache License 2.0
+  Kotlin 2.4.0 and the kotlinx libraries (coroutines, serialization,
+    datetime) — Copyright JetBrains s.r.o. and contributors
+  Compose Multiplatform 1.11.1 — Copyright JetBrains s.r.o.
+  Jetpack Compose and AndroidX Lifecycle — Copyright The Android Open
+    Source Project
+  Ktor 3.4.3 — Copyright JetBrains s.r.o.
+  gRPC 1.82.2 and grpc-kotlin 1.5.0 — Copyright The gRPC Authors
+  Netty 4.2.15.Final — Copyright The Netty Project
+  ZXing 3.5.4 — Copyright ZXing Authors
+  Decompose 3.5.0, Essenty 2.5.0 — Copyright Arkadii Ivanov
+  Clikt 5.1.0 — Copyright AJ Alt
+  IntelliJ Platform PSI 243.21565.199 — Copyright JetBrains s.r.o.
+
+  These carry no notice obligation beyond attribution and the retention of
+  their license text, which travels with each artifact inside the
+  distribution.
+
+
+===============================================================================
+5. First-party plugins bundled with the installers
+===============================================================================
+
+The installers ship the following BOSS plugins, all Copyright Risa Labs Inc.:
+
+  boss-plugin-api, terminal-tab, terminal, fluck-browser, editor-tab,
+  plugin-manager, bookmarks
+
+These plugin repositories do not currently publish their own license files.
+Until they do, treat them as proprietary to Risa Labs Inc. and not covered by
+the Apache-2.0 grant in LICENSE. Note that terminal-tab embeds BossTerm and
+editor-tab builds against BossEditor; see section 2 for those components.
+
+
+===============================================================================
+
+This notice describes the composition of the BOSS distributions as of BOSS
+9.x. Component versions change between releases; the authoritative dependency
+set for any given release is the version catalog in that release's source tree
+(gradle/libs.versions.toml). Corrections are welcome via issue or pull request.

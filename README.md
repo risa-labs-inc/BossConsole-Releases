@@ -298,6 +298,6 @@ BOSS is developed by [Risa Labs](https://www.risalabs.ai), a company focused on 
 
 ---
 
-**© 2025-2026 Risa Labs Inc.** Licensed under the [Apache License, Version 2.0](LICENSE).
+**© 2025-2026 Risa Labs Inc.** Licensed under the [Apache License, Version 2.0](LICENSE). The installers bundle third-party components under their own terms — including a commercial browser library and a GPL+CE Java runtime. See [NOTICE](NOTICE).
 
 For enterprise licensing and custom deployments, contact [enterprise@risalabs.ai](mailto:enterprise@risalabs.ai)
