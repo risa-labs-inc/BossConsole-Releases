@@ -41,9 +41,15 @@ Eclipse Temurin JRE 17 (Adoptium)
 
 BossEditor (com.risaboss:bosseditor-compose-desktop)
   GNU Lesser General Public License, version 3.0.
-  Copyright Risa Labs Inc. Bundled and linked as a library. LGPL-3.0 entitles
-  you to the library's source and to relink BOSS against a modified version.
+  Copyright Risa Labs Inc. Bundled inside the editor-tab plugin's JAR, not
+  provided by the host classloader. LGPL-3.0 entitles you to the library's
+  source and to relink against a modified version.
   Complete source: https://github.com/risa-labs-inc/BossEditor
+
+  BossEditor is being relicensed to Apache-2.0. That change is not
+  retroactive: the versions bundled today (1.0.4 in editor-tab) were
+  published under LGPL-3.0 and remain so. This entry moves to section 4 once
+  a post-relicense release ships and the plugin's pin is bumped.
 
 BossTerm (com.risaboss:bossterm-compose)
   Dual-licensed: LGPLv3 OR Apache-2.0. Used here under Apache-2.0.
@@ -117,15 +123,19 @@ Apache License 2.0
 5. First-party plugins bundled with the installers
 ===============================================================================
 
-The installers ship the following BOSS plugins, all Copyright Risa Labs Inc.:
+The installers ship the following BOSS plugins, all Copyright Risa Labs Inc.
+and all licensed under the Apache License, Version 2.0:
 
   boss-plugin-api, terminal-tab, terminal, fluck-browser, editor-tab,
   plugin-manager, bookmarks
 
-These plugin repositories do not currently publish their own license files.
-Until they do, treat them as proprietary to Risa Labs Inc. and not covered by
-the Apache-2.0 grant in LICENSE. Note that terminal-tab embeds BossTerm and
-editor-tab builds against BossEditor; see section 2 for those components.
+Two of them bundle a third-party library inside their own JAR and carry their
+own NOTICE recording it:
+
+  terminal-tab  bundles BossTerm, taken under its Apache-2.0 option
+  editor-tab    bundles BossEditor under LGPL-3.0
+
+See section 2 for both libraries.
 
 
 ===============================================================================
