@@ -67,12 +67,12 @@ done
 echo "✅ Created Release file"
 
 # Sign Release file if GPG key is available
-if command -v gpg &> /dev/null && gpg --list-secret-keys | grep -q "noreply@risa-labs.com"; then
-    gpg --default-key "noreply@risa-labs.com" -abs -o dists/stable/Release.gpg dists/stable/Release
-    gpg --default-key "noreply@risa-labs.com" --clearsign -o dists/stable/InRelease dists/stable/Release
+if command -v gpg &> /dev/null && gpg --list-secret-keys | grep -q "enterprise@risalabs.ai"; then
+    gpg --default-key "enterprise@risalabs.ai" -abs -o dists/stable/Release.gpg dists/stable/Release
+    gpg --default-key "enterprise@risalabs.ai" --clearsign -o dists/stable/InRelease dists/stable/Release
     echo "✅ Signed Release file"
 else
-    echo "⚠️  No GPG key found for noreply@risa-labs.com"
+    echo "⚠️  No GPG key found for enterprise@risalabs.ai"
     echo "   Repository will work but packages won't be signed"
 fi
 
