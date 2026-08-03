@@ -2,7 +2,7 @@
 
 [![BOSS Version](https://img.shields.io/github/v/release/risa-labs-inc/BossConsole-Releases.svg?label=BOSS&color=brightgreen)](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-blue.svg)](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest)
-[![License](https://img.shields.io/badge/license-Proprietary-red.svg)](https://github.com/risa-labs-inc/BossConsole-Releases/blob/main/LICENSE)
+[![License](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://github.com/risa-labs-inc/BossConsole-Releases/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/github/downloads/risa-labs-inc/BossConsole-Releases/total.svg)](https://github.com/risa-labs-inc/BossConsole-Releases/releases)
 
 BOSS (Business OS + Simulator) is a sophisticated, AI-powered workspace designed for complex business operations, with specialized features for healthcare administration, workflow automation, and intelligent process management.
@@ -298,6 +298,6 @@ BOSS is developed by [Risa Labs](https://www.risalabs.ai), a company focused on 
 
 ---
 
-**© 2025 Risa Labs Inc. All rights reserved.**
+**© 2025-2026 Risa Labs Inc.** Licensed under the [Apache License, Version 2.0](LICENSE).
 
 For enterprise licensing and custom deployments, contact [enterprise@risalabs.ai](mailto:enterprise@risalabs.ai)

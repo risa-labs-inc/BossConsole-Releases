@@ -213,4 +213,4 @@ We acknowledge and appreciate security researchers who help improve BOSS securit
 
 For additional security questions or concerns, please contact our security team at [security@risalabs.ai](mailto:security@risalabs.ai).
 
-**© 2025 Risa Labs Inc. All rights reserved.**
+**© 2025-2026 Risa Labs Inc.**

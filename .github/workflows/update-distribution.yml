@@ -114,8 +114,8 @@ jobs:
           cd homebrew-tap
           
           # Configure git
-          git config user.name "kshivang"
-          git config user.email "shivang.iitk@gmail.com"
+          git config user.name "Risa Labs"
+          git config user.email "enterprise@risalabs.ai"
           
           # Update the cask file
           VERSION="${{ steps.release_info.outputs.VERSION }}"
@@ -201,8 +201,8 @@ jobs:
           cd homebrew-cask-repo
           
           # Configure git
-          git config user.name "kshivang"
-          git config user.email "shivang.iitk@gmail.com"
+          git config user.name "Risa Labs"
+          git config user.email "enterprise@risalabs.ai"
           
           # Verify remotes (origin should be our fork, we'll add upstream for official repo)
           echo "🔍 Initial git remotes after cloning from fork:"
