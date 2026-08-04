@@ -9,7 +9,7 @@ BOSS (Business OS + Simulator) is a sophisticated, AI-powered workspace designed
 
 ## 🚀 Latest Release
 
-Every link below downloads the newest release directly — no version to look up, nothing to keep current.
+Every link below downloads the newest release directly - no version to look up, nothing to keep current.
 
 | Platform | Architecture | Download |
 |----------|--------------|----------|
@@ -19,7 +19,7 @@ Every link below downloads the newest release directly — no version to look up
 | **Linux** | AMD64 | [📦 DEB](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=deb&arch=amd64) \| [📦 RPM](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=rpm&arch=amd64) \| [📦 JAR](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=jar&arch=amd64) |
 | **Linux** | ARM64 | [📦 DEB](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=deb&arch=arm64) \| [📦 RPM](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=rpm&arch=arm64) \| [📦 JAR](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=jar&arch=arm64) |
 
-These redirect to the current installer and need no API key. Release metadata — version, every asset, sha256 checksums — is at [`?app=boss`](https://api.risaboss.com/functions/v1/latest-release?app=boss). Pre-releases are excluded by default; add `&prerelease=true` to any link to consider them too, and `&channel=beta` (or `alpha`, `rc`) to track a single channel. To browse or pin a specific version, see [all releases](https://github.com/risa-labs-inc/BossConsole-Releases/releases).
+These redirect to the current installer and need no API key. Release metadata - version, every asset, sha256 checksums - is at [`?app=boss`](https://api.risaboss.com/functions/v1/latest-release?app=boss). Pre-releases are excluded by default; add `&prerelease=true` to any link to consider them too, and `&channel=beta` (or `alpha`, `rc`) to track a single channel. To browse or pin a specific version, see [all releases](https://github.com/risa-labs-inc/BossConsole-Releases/releases).
 
 > 💡 **Quick Install (Recommended)**:
 > ```bash
@@ -134,8 +134,8 @@ curl -fsSL .../install.sh | bash -s -- --uninstall
 ```
 
 Upgrading over an existing install is the normal path and needs no flag: when
-there is a terminal you are asked to confirm, and when there isn't — a CI step,
-a provisioning script — it proceeds. `--force` skips the question outright. It
+there is a terminal you are asked to confirm, and when there isn't - a CI step,
+a provisioning script - it proceeds. `--force` skips the question outright. It
 never removes your configuration; an uninstall only does that if you confirm it
 at a terminal.
 
@@ -184,7 +184,7 @@ brew update && brew upgrade --cask boss
 <details>
 <summary><strong>macOS: Direct Download (DMG)</strong></summary>
 
-1. Download [BOSS for macOS](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=dmg) — one Universal DMG covers Apple Silicon and Intel
+1. Download [BOSS for macOS](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=dmg) - one Universal DMG covers Apple Silicon and Intel
 2. Mount the DMG and drag BOSS to Applications
 3. Launch BOSS from Applications folder
 </details>
@@ -192,7 +192,7 @@ brew update && brew upgrade --cask boss
 <details>
 <summary><strong>Windows: Direct Download (MSI)</strong></summary>
 
-1. Download the installer for your architecture — [x64](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=msi) or [ARM64](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=msi&arch=arm64)
+1. Download the installer for your architecture - [x64](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=msi) or [ARM64](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=msi&arch=arm64)
 2. Run the installer with administrator privileges
 3. Launch BOSS from Start Menu or Desktop shortcut
 </details>
@@ -202,14 +202,14 @@ brew update && brew upgrade --cask boss
 
 > **📝 Note**: BOSS packages are large (~250MB) and exceed GitHub's file size limits for APT repositories. We provide direct downloads instead.
 
-Swap `arch=amd64` for `arch=arm64` on an aarch64 machine. Quote the URL — the shell would otherwise read `&` as "run in background".
+Swap `arch=amd64` for `arch=arm64` on an aarch64 machine. Quote the URL - the shell would otherwise read `&` as "run in background".
 
 **Ubuntu/Debian (DEB Package)**
 ```bash
 # Download latest DEB package
 curl -fL -o boss-latest.deb "https://api.risaboss.com/functions/v1/latest-release?app=boss&download=deb&arch=amd64"
 
-# Install — apt resolves dependencies and honours Recommends (dpkg -i skips those)
+# Install - apt resolves dependencies and honours Recommends (dpkg -i skips those)
 sudo apt-get install ./boss-latest.deb
 
 # Launch
@@ -241,7 +241,7 @@ java -jar boss-latest.jar
 
 > Pass `-o <name>`, not `-O`. There is no `Content-Disposition` header on these
 > downloads, so `curl -O` would name the file after the URL's last path
-> segment — `latest-release` — rather than the installer. A browser resolves
+> segment - `latest-release` - rather than the installer. A browser resolves
 > the redirect first and does save `BOSS-<version>-amd64.deb`.
 </details>
 
@@ -318,6 +318,6 @@ BOSS is developed by [Risa Labs](https://www.risalabs.ai), a company focused on 
 
 ---
 
-**© 2025-2026 Risa Labs Inc.** Licensed under the [Apache License, Version 2.0](LICENSE). The installers bundle third-party components under their own terms — including a commercial browser library and a GPL+CE Java runtime. See [NOTICE](NOTICE).
+**© 2025-2026 Risa Labs Inc.** Licensed under the [Apache License, Version 2.0](LICENSE). The installers bundle third-party components under their own terms - including a commercial browser library and a GPL+CE Java runtime. See [NOTICE](NOTICE).
 
 For enterprise licensing and custom deployments, contact [enterprise@risalabs.ai](mailto:enterprise@risalabs.ai)
