@@ -42,6 +42,14 @@ param(
 $GitHubRepo = "risa-labs-inc/BossConsole-Releases"
 $GitHubReleaseUrl = "https://github.com/$GitHubRepo/releases/download"
 $GitHubApiUrl = "https://api.github.com/repos/$GitHubRepo/releases/latest"
+
+# Primary release source. The latest-release edge function needs no API key and
+# is not subject to GitHub's rate limit; unauthenticated api.github.com allows
+# 60 requests per hour per IP, which a shared address or a CI runner can
+# exhaust — and this script's only recourse then is to fail and ask for -Version
+# by hand. GitHub stays as the fallback on both lookups and downloads.
+$LatestReleaseApi = "https://api.risaboss.com/functions/v1/latest-release?app=boss"
+$CdnReleaseUrl = "https://api.risaboss.com/storage/v1/object/public/app-releases/boss"
 $ScriptVersion = "1.0.0"
 
 # ============================================================================
@@ -91,12 +99,24 @@ function Get-Architecture {
 
 function Get-LatestVersion {
     try {
+        $response = Invoke-RestMethod -Uri $LatestReleaseApi -UseBasicParsing
+        if ($response.version) {
+            return $response.version
+        }
+        throw "response contained no version"
+    }
+    catch {
+        Write-Warn "Could not reach the release API ($_); falling back to GitHub"
+    }
+
+    try {
         $response = Invoke-RestMethod -Uri $GitHubApiUrl -UseBasicParsing
         $version = $response.tag_name -replace '^v', ''
         return $version
     }
     catch {
         Write-Err "Failed to fetch latest version: $_"
+        Write-Err "Specify a version explicitly with -Version"
         exit 1
     }
 }
@@ -118,7 +138,8 @@ function Install-BOSS {
         $msiFileName = "BOSS-$Version.msi"
     }
 
-    $downloadUrl = "$GitHubReleaseUrl/v$Version/$msiFileName"
+    $downloadUrl = "$CdnReleaseUrl/$Version/$msiFileName"
+    $fallbackUrl = "$GitHubReleaseUrl/v$Version/$msiFileName"
     $tempPath = Join-Path $env:TEMP $msiFileName
 
     Write-Info "Installing BOSS version $Version ($Arch)..."
@@ -129,14 +150,23 @@ function Install-BOSS {
         return
     }
 
-    # Download MSI
+    # Download MSI. Both URLs point at the same asset — the CDN copy and the
+    # GitHub release copy — so a bucket that has not caught up, or a version
+    # predating the bucket, still installs.
     Write-Info "Downloading from $downloadUrl"
     try {
         Invoke-WebRequest -Uri $downloadUrl -OutFile $tempPath -UseBasicParsing
     }
     catch {
-        Write-Err "Failed to download MSI: $_"
-        exit 1
+        Write-Warn "Download failed ($_); retrying from GitHub"
+        Write-Info "Downloading from $fallbackUrl"
+        try {
+            Invoke-WebRequest -Uri $fallbackUrl -OutFile $tempPath -UseBasicParsing
+        }
+        catch {
+            Write-Err "Failed to download MSI: $_"
+            exit 1
+        }
     }
 
     # Run MSI installer

@@ -24,6 +24,14 @@ GITHUB_REPO="risa-labs-inc/BossConsole-Releases"
 GITHUB_RELEASE_URL="https://github.com/${GITHUB_REPO}/releases/download"
 GITHUB_API_URL="https://api.github.com/repos/${GITHUB_REPO}/releases/latest"
 
+# Primary release source. The latest-release edge function needs no API key and
+# is not subject to GitHub's rate limit; unauthenticated api.github.com allows
+# 60 requests per hour per IP, which a shared address or a CI runner can
+# exhaust — and this script's only recourse then is to tell the user to pass
+# --version by hand. GitHub stays as the fallback on both lookups and downloads.
+LATEST_RELEASE_API="https://api.risaboss.com/functions/v1/latest-release?app=boss"
+CDN_RELEASE_URL="https://api.risaboss.com/storage/v1/object/public/app-releases/boss"
+
 # Installation paths
 MACOS_APP_PATH="/Applications/BOSS.app"
 CLI_SYSTEM_PATH="/usr/local/bin/boss"
@@ -61,8 +69,11 @@ success() {
     echo -e "${GREEN}==>${NC} ${BOLD}$1${NC}"
 }
 
+# Diagnostics go to stderr, like error(). get_latest_version's stdout IS its
+# return value, so a warning on stdout would be captured into the version
+# string and produce a download URL built from the warning text.
 warn() {
-    echo -e "${YELLOW}Warning:${NC} $1"
+    echo -e "${YELLOW}Warning:${NC} $1" >&2
 }
 
 error() {
@@ -143,16 +154,42 @@ as_root() {
 # Version Management
 # ============================================================================
 
+fetch_url() {
+    local url="$1"
+    if has_command curl; then
+        curl -sL "$url" 2>/dev/null
+    elif has_command wget; then
+        wget -qO- "$url" 2>/dev/null
+    fi
+}
+
 get_latest_version() {
     local version
-    if has_command curl; then
-        version=$(curl -sL "$GITHUB_API_URL" 2>/dev/null | grep '"tag_name"' | sed -E 's/.*"v([^"]+)".*/\1/' | head -1)
-    elif has_command wget; then
-        version=$(wget -qO- "$GITHUB_API_URL" 2>/dev/null | grep '"tag_name"' | sed -E 's/.*"v([^"]+)".*/\1/' | head -1)
+
+    # The edge function answers with {"app":"boss","version":"X.Y.Z",...}.
+    # `release_notes` in that payload escapes its own quotes, so a literal
+    # "version": inside the notes cannot match this pattern.
+    version=$(fetch_url "$LATEST_RELEASE_API" \
+        | grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' \
+        | head -1 \
+        | sed -E 's/.*"([^"]+)"$/\1/')
+
+    if [ -z "$version" ]; then
+        warn "Could not reach the release API; falling back to GitHub"
+        version=$(fetch_url "$GITHUB_API_URL" | grep '"tag_name"' | sed -E 's/.*"v([^"]+)".*/\1/' | head -1)
     fi
 
     if [ -z "$version" ]; then
         error "Failed to fetch latest version. Please specify a version with --version"
+        exit 1
+    fi
+
+    # Refuse anything that is not a bare version. This function's stdout is its
+    # return value, so any stray output here would otherwise be pasted into a
+    # download URL and fail much later with an unrecognisable message.
+    if ! echo "$version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta|rc)\.[0-9]+)?$'; then
+        error "Resolved version is not a version number: '$version'"
+        error "Please specify a version with --version"
         exit 1
     fi
 
@@ -163,20 +200,48 @@ get_latest_version() {
 # Download Helpers
 # ============================================================================
 
-download_file() {
+fetch_to_file() {
     local url="$1"
     local output="$2"
 
-    info "Downloading from $url"
-
     if has_command curl; then
-        curl -fsSL --progress-bar "$url" -o "$output"
+        curl -fL --progress-bar "$url" -o "$output"
     elif has_command wget; then
         wget -q --show-progress "$url" -O "$output"
     else
         error "Neither curl nor wget found. Please install one of them."
         exit 1
     fi
+}
+
+# Downloads $1, falling back to $3 if given. Both point at the same asset —
+# the CDN copy and the GitHub release copy — so a bucket that has not caught
+# up, or a version predating the bucket, still installs.
+download_file() {
+    local url="$1"
+    local output="$2"
+    local fallback_url="${3:-}"
+
+    info "Downloading from $url"
+
+    if fetch_to_file "$url" "$output"; then
+        return 0
+    fi
+
+    if [ -n "$fallback_url" ]; then
+        warn "Download failed; retrying from GitHub"
+        info "Downloading from $fallback_url"
+        if fetch_to_file "$fallback_url" "$output"; then
+            return 0
+        fi
+        error "Failed to download from both sources:"
+        error "  $url"
+        error "  $fallback_url"
+        exit 1
+    fi
+
+    error "Failed to download $url"
+    exit 1
 }
 
 # ============================================================================
@@ -206,7 +271,9 @@ check_installed() {
 
 install_macos_dmg() {
     local version="$1"
-    local dmg_url="${GITHUB_RELEASE_URL}/v${version}/BOSS-${version}-Universal.dmg"
+    local asset="BOSS-${version}-Universal.dmg"
+    local dmg_url="${CDN_RELEASE_URL}/${version}/${asset}"
+    local dmg_fallback_url="${GITHUB_RELEASE_URL}/v${version}/${asset}"
     local tmp_dmg
     local mount_point
 
@@ -222,7 +289,7 @@ install_macos_dmg() {
     tmp_dmg=$(mktemp /tmp/BOSS-XXXXXX.dmg)
 
     # Download Universal DMG (works on Apple Silicon and Intel via Rosetta 2)
-    download_file "$dmg_url" "$tmp_dmg"
+    download_file "$dmg_url" "$tmp_dmg" "$dmg_fallback_url"
 
     # Mount DMG
     info "Mounting DMG..."
@@ -260,7 +327,9 @@ install_macos_dmg() {
 install_linux_deb() {
     local version="$1"
     local arch="$2"
-    local deb_url="${GITHUB_RELEASE_URL}/v${version}/BOSS-${version}-${arch}.deb"
+    local asset="BOSS-${version}-${arch}.deb"
+    local deb_url="${CDN_RELEASE_URL}/${version}/${asset}"
+    local deb_fallback_url="${GITHUB_RELEASE_URL}/v${version}/${asset}"
     local tmp_deb
 
     info "Installing BOSS from Deb package (version ${version}, arch ${arch})..."
@@ -275,7 +344,7 @@ install_linux_deb() {
     tmp_deb=$(mktemp /tmp/boss-XXXXXX.deb)
 
     # Download Deb
-    download_file "$deb_url" "$tmp_deb"
+    download_file "$deb_url" "$tmp_deb" "$deb_fallback_url"
 
     # Install
     info "Installing package..."
@@ -298,7 +367,9 @@ install_linux_rpm() {
     local version="$1"
     local arch="$2"
     local rpm_arch
+    local asset
     local rpm_url
+    local rpm_fallback_url
     local tmp_rpm
 
     # Map architecture
@@ -311,7 +382,9 @@ install_linux_rpm() {
             ;;
     esac
 
-    rpm_url="${GITHUB_RELEASE_URL}/v${version}/BOSS-${version}-${arch}.rpm"
+    asset="BOSS-${version}-${arch}.rpm"
+    rpm_url="${CDN_RELEASE_URL}/${version}/${asset}"
+    rpm_fallback_url="${GITHUB_RELEASE_URL}/v${version}/${asset}"
 
     info "Installing BOSS from RPM package (version ${version}, arch ${rpm_arch})..."
 
@@ -325,7 +398,7 @@ install_linux_rpm() {
     tmp_rpm=$(mktemp /tmp/boss-XXXXXX.rpm)
 
     # Download RPM
-    download_file "$rpm_url" "$tmp_rpm"
+    download_file "$rpm_url" "$tmp_rpm" "$rpm_fallback_url"
 
     # Install
     info "Installing package..."

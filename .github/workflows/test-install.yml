@@ -64,6 +64,15 @@ jobs:
           echo "$OUTPUT"
           echo "$OUTPUT" | grep -q "darwin"
 
+      # Every other dry-run pins --version, which skips version resolution
+      # entirely — so without this step the lookup path ships untested.
+      - name: Test latest-version resolution (dry-run, unpinned)
+        run: |
+          OUTPUT=$(./install.sh --dry-run 2>&1)
+          echo "$OUTPUT"
+          echo "$OUTPUT" | grep -qE 'Installing BOSS version [0-9]+\.[0-9]+\.[0-9]+'
+          echo "$OUTPUT" | grep -q 'app-releases/boss/'
+
       - name: Test install (real)
         if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
         run: ./install.sh
@@ -95,6 +104,15 @@ jobs:
           echo "$OUTPUT"
           echo "$OUTPUT" | grep -q "linux"
           echo "$OUTPUT" | grep -q "amd64"
+
+      # Every other dry-run pins --version, which skips version resolution
+      # entirely — so without this step the lookup path ships untested.
+      - name: Test latest-version resolution (dry-run, unpinned)
+        run: |
+          OUTPUT=$(./install.sh --dry-run 2>&1)
+          echo "$OUTPUT"
+          echo "$OUTPUT" | grep -qE 'Installing BOSS version [0-9]+\.[0-9]+\.[0-9]+'
+          echo "$OUTPUT" | grep -q 'app-releases/boss/'
 
       - name: Test install (real)
         if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
@@ -234,6 +252,23 @@ jobs:
           .\install.ps1 -DryRun -Version 8.15.10
         shell: pwsh
 
+      # -Version 8.15.10 above skips Get-LatestVersion entirely, so without
+      # this step the lookup path ships untested on Windows.
+      - name: Test latest-version resolution (dry-run, unpinned)
+        run: |
+          # *>&1, not 2>&1: the script reports progress with Write-Host, which
+          # writes to the information stream (6). Merging only stderr leaves
+          # $out empty even though the console shows every line.
+          $out = (.\install.ps1 -DryRun *>&1 | Out-String)
+          Write-Host $out
+          if ($out -notmatch 'Installing BOSS version \d+\.\d+\.\d+') {
+            throw "version was not resolved"
+          }
+          if ($out -notmatch 'app-releases/boss/') {
+            throw "did not download from the release CDN"
+          }
+        shell: pwsh
+
       - name: Test install (real)
         if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
         run: .\install.ps1
@@ -275,6 +310,16 @@ jobs:
       - name: Test /dryrun
         run: |
           install.bat /dryrun /version:8.15.10
+        shell: cmd
+
+      # /version above skips :get_latest_version entirely, so without this step
+      # the PowerShell-backed lookup in install.bat ships untested.
+      - name: Test latest-version resolution (dryrun, unpinned)
+        run: |
+          install.bat /dryrun > out.txt 2>&1
+          type out.txt
+          findstr /r /c:"Installing BOSS version [0-9][0-9]*\.[0-9][0-9]*\.[0-9]" out.txt || exit /b 1
+          findstr /c:"app-releases/boss/" out.txt || exit /b 1
         shell: cmd
 
       - name: Test install (real)
