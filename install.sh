@@ -69,8 +69,11 @@ success() {
     echo -e "${GREEN}==>${NC} ${BOLD}$1${NC}"
 }
 
+# Diagnostics go to stderr, like error(). get_latest_version's stdout IS its
+# return value, so a warning on stdout would be captured into the version
+# string and produce a download URL built from the warning text.
 warn() {
-    echo -e "${YELLOW}Warning:${NC} $1"
+    echo -e "${YELLOW}Warning:${NC} $1" >&2
 }
 
 error() {
@@ -181,6 +184,15 @@ get_latest_version() {
         exit 1
     fi
 
+    # Refuse anything that is not a bare version. This function's stdout is its
+    # return value, so any stray output here would otherwise be pasted into a
+    # download URL and fail much later with an unrecognisable message.
+    if ! echo "$version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+'; then
+        error "Resolved version is not a version number: '$version'"
+        error "Please specify a version with --version"
+        exit 1
+    fi
+
     echo "$version"
 }
 
@@ -222,6 +234,10 @@ download_file() {
         if fetch_to_file "$fallback_url" "$output"; then
             return 0
         fi
+        error "Failed to download from both sources:"
+        error "  $url"
+        error "  $fallback_url"
+        exit 1
     fi
 
     error "Failed to download $url"
