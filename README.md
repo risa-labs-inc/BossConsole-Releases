@@ -88,7 +88,7 @@ BOSS includes optimized layouts for different roles:
 ## 💻 System Requirements
 
 ### macOS
-- **OS**: macOS 11.0 (Big Sur) or later
+- **OS**: macOS 13.0 (Ventura) or later
 - **Architecture**: Universal (Apple Silicon native, Intel via Rosetta 2)
 - **Memory**: 4 GB RAM minimum, 8 GB recommended
 - **Storage**: 500 MB available space

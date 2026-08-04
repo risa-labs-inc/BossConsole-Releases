@@ -43,11 +43,11 @@ $GitHubRepo = "risa-labs-inc/BossConsole-Releases"
 $GitHubReleaseUrl = "https://github.com/$GitHubRepo/releases/download"
 $GitHubApiUrl = "https://api.github.com/repos/$GitHubRepo/releases/latest"
 
-# Primary release source. The latest-release edge function needs no API key
-# and has no rate limit; unauthenticated api.github.com allows 60 requests
-# per hour per IP, which a shared address or a CI runner can exhaust — and
-# this script's only recourse then is to fail and ask for -Version by hand.
-# GitHub stays as the fallback on both lookups and downloads.
+# Primary release source. The latest-release edge function needs no API key and
+# is not subject to GitHub's rate limit; unauthenticated api.github.com allows
+# 60 requests per hour per IP, which a shared address or a CI runner can
+# exhaust — and this script's only recourse then is to fail and ask for -Version
+# by hand. GitHub stays as the fallback on both lookups and downloads.
 $LatestReleaseApi = "https://api.risaboss.com/functions/v1/latest-release?app=boss"
 $CdnReleaseUrl = "https://api.risaboss.com/storage/v1/object/public/app-releases/boss"
 $ScriptVersion = "1.0.0"

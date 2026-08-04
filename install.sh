@@ -24,11 +24,11 @@ GITHUB_REPO="risa-labs-inc/BossConsole-Releases"
 GITHUB_RELEASE_URL="https://github.com/${GITHUB_REPO}/releases/download"
 GITHUB_API_URL="https://api.github.com/repos/${GITHUB_REPO}/releases/latest"
 
-# Primary release source. The latest-release edge function needs no API key
-# and has no rate limit; unauthenticated api.github.com allows 60 requests
-# per hour per IP, which a shared address or a CI runner can exhaust — and
-# this script's only recourse then is to tell the user to pass --version by
-# hand. GitHub stays as the fallback on both lookups and downloads.
+# Primary release source. The latest-release edge function needs no API key and
+# is not subject to GitHub's rate limit; unauthenticated api.github.com allows
+# 60 requests per hour per IP, which a shared address or a CI runner can
+# exhaust — and this script's only recourse then is to tell the user to pass
+# --version by hand. GitHub stays as the fallback on both lookups and downloads.
 LATEST_RELEASE_API="https://api.risaboss.com/functions/v1/latest-release?app=boss"
 CDN_RELEASE_URL="https://api.risaboss.com/storage/v1/object/public/app-releases/boss"
 
@@ -187,7 +187,7 @@ get_latest_version() {
     # Refuse anything that is not a bare version. This function's stdout is its
     # return value, so any stray output here would otherwise be pasted into a
     # download URL and fail much later with an unrecognisable message.
-    if ! echo "$version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+'; then
+    if ! echo "$version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta|rc)\.[0-9]+)?$'; then
         error "Resolved version is not a version number: '$version'"
         error "Please specify a version with --version"
         exit 1
