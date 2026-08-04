@@ -256,7 +256,10 @@ jobs:
       # this step the lookup path ships untested on Windows.
       - name: Test latest-version resolution (dry-run, unpinned)
         run: |
-          $out = (.\install.ps1 -DryRun 2>&1 | Out-String)
+          # *>&1, not 2>&1: the script reports progress with Write-Host, which
+          # writes to the information stream (6). Merging only stderr leaves
+          # $out empty even though the console shows every line.
+          $out = (.\install.ps1 -DryRun *>&1 | Out-String)
           Write-Host $out
           if ($out -notmatch 'Installing BOSS version \d+\.\d+\.\d+') {
             throw "version was not resolved"
