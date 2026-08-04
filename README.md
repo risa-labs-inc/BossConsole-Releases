@@ -126,9 +126,18 @@ curl -fsSL .../install.sh | bash -s -- --version 8.15.10
 # Dry run (preview without installing)
 curl -fsSL .../install.sh | bash -s -- --dry-run
 
+# Reinstall over an existing install without being asked
+curl -fsSL .../install.sh | bash -s -- --force
+
 # Uninstall
 curl -fsSL .../install.sh | bash -s -- --uninstall
 ```
+
+Upgrading over an existing install is the normal path and needs no flag: when
+there is a terminal you are asked to confirm, and when there isn't — a CI step,
+a provisioning script — it proceeds. `--force` skips the question outright. It
+never removes your configuration; an uninstall only does that if you confirm it
+at a terminal.
 
 #### Windows (PowerShell)
 ```powershell

@@ -41,6 +41,15 @@ CONFIG_PATH="${HOME}/.boss"
 # Script version
 SCRIPT_VERSION="1.0.0"
 
+# Flags. These were only ever assigned inside the argument parser and compared
+# with `[ "$X" = true ]`, which happens to work unset because there is no
+# `set -u` — FORCE had no flag setting it at all, so its guard was dead and the
+# prompt it guarded always fired. Declared here so each one has exactly one
+# obvious default.
+DRY_RUN=false
+SKIP_CLI=false
+FORCE=false
+
 # ============================================================================
 # Colors and Output
 # ============================================================================
@@ -121,6 +130,56 @@ detect_distro() {
 
 has_command() {
     command -v "$1" >/dev/null 2>&1
+}
+
+# Ask a [y/N] question. Echoes "yes", "no", or "unattended" when there is
+# nobody to ask. Callers choose what "unattended" means for their question.
+#
+# A bare `read` is wrong here in three separate ways, and the primary install
+# path hits all of them:
+#
+#   * `curl … | bash` makes the SCRIPT bash's stdin, so `read` consumes the
+#     script's own next line as the answer rather than anything a user typed.
+#   * Under `set -e`, a `read` that reaches EOF returns non-zero and kills the
+#     script on the spot — which is why the "Installation cancelled" branch was
+#     unreachable and an unattended upgrade simply stopped with exit 1 after
+#     announcing that BOSS was already installed.
+#   * With stdin an open pipe that never delivers (a CI step, a wrapper script),
+#     `read` blocks forever.
+#
+# So: read from stdin when it is a terminal, otherwise from the controlling
+# terminal if there is one — that is the `curl … | bash` case, where a human IS
+# present but stdin is the script. Only when neither exists is there truly
+# nobody to ask.
+#
+# `( : </dev/tty )` and not `exec 3</dev/tty`: a failed redirection on `exec`
+# terminates a non-interactive shell, so probing that way would kill the
+# installer on exactly the machines that have no controlling terminal. The
+# subshell absorbs the failure instead.
+#
+# The prompt is written to stderr explicitly rather than via `read -p`, because
+# this function's stdout is its return value.
+confirm() {
+    local prompt="$1"
+    local reply=""
+
+    if [ -t 0 ]; then
+        printf '%s' "$prompt" >&2
+        read -r -n 1 reply || reply=""
+        printf '\n' >&2
+    elif ( : </dev/tty ) 2>/dev/null; then
+        printf '%s' "$prompt" >&2
+        read -r -n 1 reply </dev/tty || reply=""
+        printf '\n' >&2
+    else
+        echo "unattended"
+        return 0
+    fi
+
+    case "$reply" in
+        [Yy]) echo "yes" ;;
+        *)    echo "no" ;;
+    esac
 }
 
 has_sudo() {
@@ -556,17 +615,24 @@ uninstall() {
         success "Removed user CLI launcher"
     fi
 
-    # Ask about config
+    # Ask about config. Deliberately the opposite default to the install
+    # prompt: an unattended install should proceed, but nothing unattended
+    # should delete the user's data. --force does not apply here either — "stop
+    # asking whether to upgrade" is not "delete my configuration".
     if [ -d "$CONFIG_PATH" ]; then
         echo ""
-        read -p "Remove configuration at $CONFIG_PATH? [y/N] " -n 1 -r
-        echo ""
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            rm -rf "$CONFIG_PATH"
-            success "Removed configuration"
-        else
-            info "Configuration preserved at $CONFIG_PATH"
-        fi
+        case "$(confirm "Remove configuration at $CONFIG_PATH? [y/N] ")" in
+            yes)
+                rm -rf "$CONFIG_PATH"
+                success "Removed configuration"
+                ;;
+            unattended)
+                info "No terminal to prompt on; configuration preserved at $CONFIG_PATH"
+                ;;
+            *)
+                info "Configuration preserved at $CONFIG_PATH"
+                ;;
+        esac
     fi
 
     success "BOSS uninstalled successfully"
@@ -589,6 +655,8 @@ Options:
     --uninstall          Uninstall BOSS
     --dry-run            Show what would be done without making changes
     --skip-cli           Skip CLI launcher installation
+    --force, -f, -y      Do not ask before reinstalling over an existing
+                         install. Never removes configuration.
     --help               Show this help message
 
 Examples:
@@ -641,6 +709,10 @@ main() {
                 SKIP_CLI=true
                 shift
                 ;;
+            --force|-f|--yes|-y)
+                FORCE=true
+                shift
+                ;;
             --help|-h)
                 show_usage
                 ;;
@@ -686,12 +758,21 @@ main() {
     if check_installed "$os"; then
         warn "BOSS appears to be already installed"
         if [ "$FORCE" != true ]; then
-            read -p "Continue with installation? [y/N] " -n 1 -r
-            echo ""
-            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-                info "Installation cancelled"
-                exit 0
-            fi
+            case "$(confirm 'Continue with installation? [y/N] ')" in
+                yes)
+                    ;;
+                unattended)
+                    # Installing over an existing install IS the documented
+                    # upgrade path, and an unattended invocation asked for an
+                    # install. Refusing here is what made the `curl … | bash`
+                    # one-liner unusable for upgrades.
+                    info "No terminal to prompt on; continuing with the upgrade (--force to silence)"
+                    ;;
+                *)
+                    info "Installation cancelled"
+                    exit 0
+                    ;;
+            esac
         fi
     fi
 
