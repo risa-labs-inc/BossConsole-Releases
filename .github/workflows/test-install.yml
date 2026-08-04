@@ -114,9 +114,35 @@ jobs:
           echo "$OUTPUT" | grep -qE 'Installing BOSS version [0-9]+\.[0-9]+\.[0-9]+'
           echo "$OUTPUT" | grep -q 'app-releases/boss/'
 
+      # Guards the "already installed" prompt against the failure it shipped
+      # with: FORCE gated it but no flag ever set it, so the prompt always
+      # fired, and under `set -e` a read that hits EOF kills the script. An
+      # unattended upgrade therefore stopped at the warning with exit 1 — and
+      # under the documented `curl … | bash`, read consumed the script itself.
+      # Every job above runs on a clean runner where BOSS is absent, so nothing
+      # reached this branch; a fake `boss` on PATH satisfies check_installed.
+      - name: Test unattended run with BOSS already installed
+        run: |
+          mkdir -p /tmp/fakebin
+          printf '#!/bin/sh\n' > /tmp/fakebin/boss && chmod +x /tmp/fakebin/boss
+
+          OUTPUT=$(PATH="/tmp/fakebin:$PATH" ./install.sh --dry-run --version 8.15.10 </dev/null 2>&1)
+          echo "$OUTPUT"
+          echo "$OUTPUT" | grep -q "already installed"
+          # The assertion that matters: it got PAST the prompt. The old code
+          # died at the read, so this line was never printed.
+          echo "$OUTPUT" | grep -q "Would download"
+          echo "$OUTPUT" | grep -q "No terminal to prompt on"
+
+          # --force answers it up front, with no notice at all.
+          FORCED=$(PATH="/tmp/fakebin:$PATH" ./install.sh --dry-run --version 8.15.10 --force </dev/null 2>&1)
+          echo "$FORCED"
+          echo "$FORCED" | grep -q "Would download"
+          ! echo "$FORCED" | grep -q "No terminal to prompt on"
+
       - name: Test install (real)
         if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
-        run: ./install.sh
+        run: ./install.sh --force
 
       - name: Verify installation
         if: github.event_name == 'release' || github.event.inputs.run_real_install == 'true'
