@@ -73,7 +73,14 @@ jobs:
           echo "RELEASE_URL=$RELEASE_URL" >> $GITHUB_OUTPUT
           echo "TRIGGER_TYPE=$TRIGGER_TYPE" >> $GITHUB_OUTPUT
           echo "ASSET_NAME=BOSS-${VERSION}-Universal.dmg" >> $GITHUB_OUTPUT
+          # Deliberately a pinned, versioned URL rather than a `latest-release`
+          # link: a Homebrew cask pairs its url with a sha256, so it cannot
+          # point at a moving target. GitHub is the primary source here for a
+          # reason too — this job runs on `release: published`, which fires
+          # before sync-release finishes uploading the assets to the bucket, so
+          # the CDN copy may not exist yet. It is the fallback, not the default.
           echo "DOWNLOAD_URL=https://github.com/risa-labs-inc/BossConsole-Releases/releases/download/v${VERSION}/BOSS-${VERSION}-Universal.dmg" >> $GITHUB_OUTPUT
+          echo "FALLBACK_DOWNLOAD_URL=https://api.risaboss.com/storage/v1/object/public/app-releases/boss/${VERSION}/BOSS-${VERSION}-Universal.dmg" >> $GITHUB_OUTPUT
           echo "PR_MESSAGE=${{ github.event.inputs.pr_message || '' }}" >> $GITHUB_OUTPUT
           echo "📦 Processing BOSS release $VERSION"
 
@@ -91,18 +98,26 @@ jobs:
       - name: Calculate SHA256 hash for Homebrew
         id: calculate_hash
         run: |
-          # Download the DMG file to calculate SHA256
+          set -euo pipefail
+
+          DMG="BOSS-${{ steps.release_info.outputs.VERSION }}-Universal.dmg"
+
+          # Download the DMG file to calculate SHA256. Both sources hold the
+          # same bytes — sync-release uploads the GitHub assets to the bucket
+          # verbatim — so either yields the hash Homebrew users will see.
           echo "⬇️ Downloading DMG to calculate SHA256..."
-          curl -fsSL -o "BOSS-${{ steps.release_info.outputs.VERSION }}-Universal.dmg" \
-            "${{ steps.release_info.outputs.DOWNLOAD_URL }}"
-          
+          if ! curl -fsSL -o "$DMG" "${{ steps.release_info.outputs.DOWNLOAD_URL }}"; then
+            echo "::warning::GitHub asset unavailable; falling back to the release CDN"
+            curl -fsSL -o "$DMG" "${{ steps.release_info.outputs.FALLBACK_DOWNLOAD_URL }}"
+          fi
+
           # Calculate SHA256
-          SHA256=$(sha256sum "BOSS-${{ steps.release_info.outputs.VERSION }}-Universal.dmg" | cut -d' ' -f1)
+          SHA256=$(sha256sum "$DMG" | cut -d' ' -f1)
           echo "SHA256=$SHA256" >> $GITHUB_OUTPUT
           echo "🔒 Calculated SHA256: $SHA256"
           
           # Clean up downloaded file
-          rm -f "BOSS-${{ steps.release_info.outputs.VERSION }}-Universal.dmg"
+          rm -f "$DMG"
 
       - name: Update Homebrew Tap
         id: update_tap

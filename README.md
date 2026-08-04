@@ -9,12 +9,17 @@ BOSS (Business OS + Simulator) is a sophisticated, AI-powered workspace designed
 
 ## 🚀 Latest Release
 
+Every link below downloads the newest release directly — no version to look up, nothing to keep current.
+
 | Platform | Architecture | Download |
 |----------|--------------|----------|
-| **macOS** | Universal (Apple Silicon + Intel) | [🍺 Homebrew](https://formulae.brew.sh/cask/boss) \| [📦 DMG](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
-| **Windows** | x64 | [📦 MSI](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
-| **Windows** | ARM64 | [📦 MSI](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
-| **Linux** | AMD64 / ARM64 | [📦 DEB](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) \| [📦 RPM](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) \| [📦 JAR](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest) |
+| **macOS** | Universal (Apple Silicon + Intel) | [🍺 Homebrew](https://formulae.brew.sh/cask/boss) \| [📦 DMG](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=dmg) |
+| **Windows** | x64 | [📦 MSI](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=msi) |
+| **Windows** | ARM64 | [📦 MSI](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=msi&arch=arm64) |
+| **Linux** | AMD64 | [📦 DEB](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=deb&arch=amd64) \| [📦 RPM](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=rpm&arch=amd64) \| [📦 JAR](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=jar&arch=amd64) |
+| **Linux** | ARM64 | [📦 DEB](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=deb&arch=arm64) \| [📦 RPM](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=rpm&arch=arm64) \| [📦 JAR](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=jar&arch=arm64) |
+
+These redirect to the current installer and need no API key. Release metadata — version, every asset, sha256 checksums — is at [`?app=boss`](https://api.risaboss.com/functions/v1/latest-release?app=boss). Pre-releases are excluded by default; add `&prerelease=true` to any link to consider them too, and `&channel=beta` (or `alpha`, `rc`) to track a single channel. To browse or pin a specific version, see [all releases](https://github.com/risa-labs-inc/BossConsole-Releases/releases).
 
 > 💡 **Quick Install (Recommended)**:
 > ```bash
@@ -170,7 +175,7 @@ brew update && brew upgrade --cask boss
 <details>
 <summary><strong>macOS: Direct Download (DMG)</strong></summary>
 
-1. Download the latest DMG file from [Releases](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest)
+1. Download [BOSS for macOS](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=dmg) — one Universal DMG covers Apple Silicon and Intel
 2. Mount the DMG and drag BOSS to Applications
 3. Launch BOSS from Applications folder
 </details>
@@ -178,7 +183,7 @@ brew update && brew upgrade --cask boss
 <details>
 <summary><strong>Windows: Direct Download (MSI)</strong></summary>
 
-1. Download the latest MSI installer from [Releases](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest)
+1. Download the installer for your architecture — [x64](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=msi) or [ARM64](https://api.risaboss.com/functions/v1/latest-release?app=boss&download=msi&arch=arm64)
 2. Run the installer with administrator privileges
 3. Launch BOSS from Start Menu or Desktop shortcut
 </details>
@@ -186,16 +191,17 @@ brew update && brew upgrade --cask boss
 <details>
 <summary><strong>Linux: Manual Package Installation</strong></summary>
 
-> **📝 Note**: BOSS packages are large (~250MB) and exceed GitHub's file size limits for APT repositories. We provide direct downloads from GitHub Releases instead.
+> **📝 Note**: BOSS packages are large (~250MB) and exceed GitHub's file size limits for APT repositories. We provide direct downloads instead.
+
+Swap `arch=amd64` for `arch=arm64` on an aarch64 machine. Quote the URL — the shell would otherwise read `&` as "run in background".
 
 **Ubuntu/Debian (DEB Package)**
 ```bash
 # Download latest DEB package
-wget $(curl -s https://api.github.com/repos/risa-labs-inc/BossConsole-Releases/releases/latest | grep "browser_download_url.*\.deb" | cut -d '"' -f 4)
+curl -fL -o boss-latest.deb "https://api.risaboss.com/functions/v1/latest-release?app=boss&download=deb&arch=amd64"
 
-# Install
-sudo dpkg -i BOSS-*.deb
-sudo apt-get install -f  # Fix any missing dependencies
+# Install — apt resolves dependencies and honours Recommends (dpkg -i skips those)
+sudo apt-get install ./boss-latest.deb
 
 # Launch
 boss
@@ -204,11 +210,11 @@ boss
 **RHEL/Fedora/openSUSE (RPM Package)**
 ```bash
 # Download latest RPM package
-wget $(curl -s https://api.github.com/repos/risa-labs-inc/BossConsole-Releases/releases/latest | grep "browser_download_url.*\.rpm" | cut -d '"' -f 4)
+curl -fL -o boss-latest.rpm "https://api.risaboss.com/functions/v1/latest-release?app=boss&download=rpm&arch=amd64"
 
 # Install
-sudo rpm -i BOSS-*.rpm
-# OR for Fedora: sudo dnf install BOSS-*.rpm
+sudo rpm -i boss-latest.rpm
+# OR for Fedora: sudo dnf install boss-latest.rpm
 
 # Launch
 boss
@@ -220,9 +226,14 @@ boss
 java -version
 
 # Download and run latest JAR
-wget $(curl -s https://api.github.com/repos/risa-labs-inc/BossConsole-Releases/releases/latest | grep "browser_download_url.*\.jar" | cut -d '"' -f 4)
-java -jar BOSS-*.jar
+curl -fL -o boss-latest.jar "https://api.risaboss.com/functions/v1/latest-release?app=boss&download=jar&arch=amd64"
+java -jar boss-latest.jar
 ```
+
+> Pass `-o <name>`, not `-O`. There is no `Content-Disposition` header on these
+> downloads, so `curl -O` would name the file after the URL's last path
+> segment — `latest-release` — rather than the installer. A browser resolves
+> the redirect first and does save `BOSS-<version>-amd64.deb`.
 </details>
 
 ## 🔄 Updates
@@ -244,7 +255,7 @@ brew update && brew upgrade --cask boss
 ```
 
 **Direct Download Users**
-- Download the latest version from [Releases](https://github.com/risa-labs-inc/BossConsole-Releases/releases/latest)
+- Download the latest version from the [table at the top of this page](#-latest-release)
 - Install over existing installation (settings preserved)
 
 > **🍎 Apple Silicon Users**: Version 8.11.4 includes a critical fix for a crash that prevented BOSS from launching on Apple Silicon Macs. If you're experiencing startup crashes, please update to 8.11.4 or later immediately.

@@ -16,6 +16,14 @@ setlocal EnableDelayedExpansion
 set "GITHUB_REPO=risa-labs-inc/BossConsole-Releases"
 set "GITHUB_RELEASE_URL=https://github.com/%GITHUB_REPO%/releases/download"
 set "GITHUB_API_URL=https://api.github.com/repos/%GITHUB_REPO%/releases/latest"
+
+:: Primary release source. The latest-release edge function needs no API key
+:: and has no rate limit; unauthenticated api.github.com allows 60 requests
+:: per hour per IP, which a shared address or a CI runner can exhaust — and
+:: this script's only recourse then is to fail and ask for /version by hand.
+:: GitHub stays as the fallback on both lookups and downloads.
+set "LATEST_RELEASE_API=https://api.risaboss.com/functions/v1/latest-release?app=boss"
+set "CDN_RELEASE_URL=https://api.risaboss.com/storage/v1/object/public/app-releases/boss"
 set "SCRIPT_VERSION=1.0.0"
 
 set "VERSION="
@@ -87,7 +95,8 @@ if "%ARCH%"=="arm64" (
     set "MSI_FILE=BOSS-%VERSION%.msi"
 )
 
-set "DOWNLOAD_URL=%GITHUB_RELEASE_URL%/v%VERSION%/%MSI_FILE%"
+set "DOWNLOAD_URL=%CDN_RELEASE_URL%/%VERSION%/%MSI_FILE%"
+set "FALLBACK_URL=%GITHUB_RELEASE_URL%/v%VERSION%/%MSI_FILE%"
 set "TEMP_MSI=%TEMP%\%MSI_FILE%"
 
 if "%DRY_RUN%"=="1" (
@@ -96,12 +105,19 @@ if "%DRY_RUN%"=="1" (
     goto :success
 )
 
-:: Download MSI
+:: Download MSI. Both URLs point at the same asset — the CDN copy and the
+:: GitHub release copy — so a bucket that has not caught up, or a version
+:: predating the bucket, still installs.
 echo Downloading from %DOWNLOAD_URL%...
 call :download_file "%DOWNLOAD_URL%" "%TEMP_MSI%"
 if errorlevel 1 (
-    echo Error: Failed to download MSI
-    exit /b 1
+    echo Warning: Download failed; retrying from GitHub
+    echo Downloading from !FALLBACK_URL!...
+    call :download_file "!FALLBACK_URL!" "%TEMP_MSI%"
+    if errorlevel 1 (
+        echo Error: Failed to download MSI
+        exit /b 1
+    )
 )
 
 :: Run installer
@@ -160,22 +176,16 @@ exit /b 0
 :: ============================================================================
 
 :get_latest_version
-:: Try curl first
-where curl >nul 2>&1
-if %errorlevel%==0 (
-    for /f "tokens=*" %%a in ('curl -sL "%GITHUB_API_URL%" 2^>nul ^| findstr /i "tag_name"') do (
-        set "LINE=%%a"
-        for /f "tokens=2 delims=:," %%b in ("!LINE!") do (
-            set "VERSION=%%~b"
-            set "VERSION=!VERSION: =!"
-            set "VERSION=!VERSION:v=!"
-        )
-    )
-    goto :eof
+:: PowerShell does the parsing on both paths. Splitting a one-line JSON body
+:: on delims in batch is far too fragile for a payload that also carries the
+:: full release notes, and PowerShell ships with every supported Windows.
+for /f "tokens=*" %%a in ('powershell -NoProfile -Command "try { (Invoke-RestMethod -Uri '%LATEST_RELEASE_API%' -UseBasicParsing).version } catch { }" 2^>nul') do (
+    set "VERSION=%%a"
 )
+if not "!VERSION!"=="" goto :eof
 
-:: Fallback to PowerShell
-for /f "tokens=*" %%a in ('powershell -NoProfile -Command "(Invoke-RestMethod -Uri '%GITHUB_API_URL%').tag_name -replace '^v',''" 2^>nul') do (
+echo Warning: Could not reach the release API; falling back to GitHub
+for /f "tokens=*" %%a in ('powershell -NoProfile -Command "try { (Invoke-RestMethod -Uri '%GITHUB_API_URL%' -UseBasicParsing).tag_name.TrimStart('v') } catch { }" 2^>nul') do (
     set "VERSION=%%a"
 )
 goto :eof
