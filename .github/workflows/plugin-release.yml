@@ -20,7 +20,76 @@ on:
         required: false
 
 jobs:
+  # Every plugin's build.yml fires this on any push to main with no path filter,
+  # and a release means: bump the version, delete and recreate the GitHub
+  # release, and publish to the Plugin Store. So a README typo used to offer
+  # every BOSS user a plugin update that changed nothing they can run.
+  #
+  # Fails toward releasing. If the previous commit cannot be resolved (a new
+  # branch, a force-push) or the event is not a push, this releases: a redundant
+  # release is cheap, a silently skipped one is not.
+  detect:
+    name: Decide whether this push needs a release
+    runs-on: ubuntu-latest
+    outputs:
+      docs_only: ${{ steps.check.outputs.docs_only }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Needed to diff against the pushed-from commit.
+          fetch-depth: 0
+
+      - name: Check whether the push is docs-only
+        id: check
+        run: |
+          set -euo pipefail
+
+          release() { echo "docs_only=false" >> "$GITHUB_OUTPUT"; }
+
+          if [[ "${{ github.event_name }}" != "push" ]]; then
+            echo "Event is ${{ github.event_name }}, not a push - releasing."
+            release; exit 0
+          fi
+
+          BEFORE="${{ github.event.before }}"
+          if [[ -z "$BEFORE" || "$BEFORE" =~ ^0+$ ]] || ! git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+            echo "::notice::Cannot resolve the previous commit; releasing rather than guessing."
+            release; exit 0
+          fi
+
+          # git diff --name-only is already one path per line. Keep it quoted:
+          # relying on word-splitting would break on a path containing a space,
+          # and it silently collapses to a single line in shells that do not
+          # split (which is how a test of this predicate first misled me).
+          CHANGED=$(git diff --name-only "$BEFORE" "${{ github.sha }}")
+          echo "Changed files:"
+          printf '%s\n' "$CHANGED" | sed 's/^/  /'
+
+          if [[ -z "$CHANGED" ]]; then
+            echo "::notice::No file changes detected; releasing."
+            release; exit 0
+          fi
+
+          # Deliberately conservative: only these count as prose. Anything else,
+          # including build files, resources and source, is a real change.
+          # The LICENSE/NOTICE alternatives are spelled out rather than using
+          # `(^|/)`, whose behaviour differs between grep implementations.
+          NON_DOCS=$(printf '%s\n' "$CHANGED" \
+            | grep -vE '\.(md|txt)$|^docs/|^(LICENSE|NOTICE)$|/(LICENSE|NOTICE)$' || true)
+
+          if [[ -z "$NON_DOCS" ]]; then
+            echo "docs_only=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Docs-only push - skipping the release. Use workflow_dispatch to force one."
+          else
+            echo "Non-docs changes present:"
+            printf '%s\n' "$NON_DOCS" | sed 's/^/  /'
+            release
+          fi
+
   release:
+    needs: detect
+    if: needs.detect.outputs.docs_only != 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
