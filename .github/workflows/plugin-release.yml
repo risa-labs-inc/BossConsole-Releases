@@ -18,6 +18,16 @@ on:
         required: true
       SUPABASE_ANON_KEY:
         required: false
+      # The version bump pushes straight to main. GITHUB_TOKEN runs as the
+      # github-actions app, which is a built-in rather than an org installation,
+      # so it cannot be named as a bypass actor on a ruleset and its push is
+      # refused once main requires a pull request. A token belonging to an org
+      # admin is covered by the OrganizationAdmin bypass and pushes fine.
+      #
+      # Optional on purpose: callers that have not been given the secret yet
+      # fall back to GITHUB_TOKEN below and keep working exactly as before.
+      PLUGIN_RELEASE_TOKEN:
+        required: false
 
 jobs:
   # Every plugin's build.yml fires this on any push to main with no path filter,
@@ -95,7 +105,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Falls back to GITHUB_TOKEN so a caller that has not been handed
+          # PLUGIN_RELEASE_TOKEN yet behaves exactly as it did before. Only
+          # repos whose main is ruleset-protected actually need the override.
+          token: ${{ secrets.PLUGIN_RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Bump version
         if: inputs.version_increment != 'none'
