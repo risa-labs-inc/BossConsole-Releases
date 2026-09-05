@@ -164,7 +164,7 @@ jobs:
       - name: Extract version
         id: version
         run: |
-          VERSION=$(grep "^version" build.gradle.kts | sed 's/version = "\(.*\)"/\1/')
+          VERSION=$(grep -m1 '^version = ' build.gradle.kts | sed 's/^version = "\([^"]*\)".*/\1/')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Delete existing release
