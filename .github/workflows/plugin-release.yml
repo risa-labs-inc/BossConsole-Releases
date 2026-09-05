@@ -111,7 +111,7 @@ jobs:
       - name: Bump version
         if: inputs.version_increment != 'none'
         run: |
-          CURRENT=$(grep '^version = ' build.gradle.kts | sed 's/version = "\(.*\)"/\1/')
+          CURRENT=$(grep -m1 '^version = ' build.gradle.kts | sed 's/^version = "\([^"]*\)".*/\1/')
           IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
 
           case "${{ inputs.version_increment }}" in
