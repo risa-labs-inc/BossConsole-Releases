@@ -156,10 +156,12 @@ jobs:
             SHA256: $SHA256"
             
             # Push with retry logic
+            PUSHED=false
             for i in {1..3}; do
               if git push; then
                 echo "✅ Successfully pushed to tap repository"
                 echo "success=true" >> $GITHUB_OUTPUT
+                PUSHED=true
                 break
               else
                 echo "❌ Push attempt $i failed, retrying in 5 seconds..."
@@ -167,6 +169,10 @@ jobs:
                 git pull --rebase
               fi
             done
+            if [[ "$PUSHED" != "true" ]]; then
+              echo "::error::Failed to push to tap repository after 3 attempts"
+              exit 1
+            fi
           fi
 
       - name: Setup Homebrew for official PR
