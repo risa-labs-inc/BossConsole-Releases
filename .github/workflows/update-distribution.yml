@@ -171,7 +171,7 @@ jobs:
 
       - name: Setup Homebrew for official PR
         if: steps.update_tap.outputs.success == 'true' && steps.release_info.outputs.TRIGGER_TYPE != 'patch_skip' && steps.release_info.outputs.TRIGGER_TYPE != 'manual_skip_pr'
-        uses: Homebrew/actions/setup-homebrew@master
+        uses: Homebrew/actions/setup-homebrew@848c272c7bfe984a197bd4d16383f4c106ec61e6
 
       - name: Create PR to official Homebrew
         if: steps.update_tap.outputs.success == 'true' && steps.release_info.outputs.TRIGGER_TYPE != 'patch_skip' && steps.release_info.outputs.TRIGGER_TYPE != 'manual_skip_pr'
