@@ -13,6 +13,16 @@ on:
         required: false
         type: string
         default: 'patch'
+      test_apt_packages:
+        description: 'Space-separated Ubuntu packages needed by plugin tests (for example fish zsh).'
+        required: false
+        type: string
+        default: ''
+      test_xvfb:
+        description: 'Run the build under Xvfb for desktop UI tests.'
+        required: false
+        type: boolean
+        default: false
     secrets:
       BOSS_STORE_PLUGIN_PUBLISH_KEY:
         required: true
@@ -156,9 +166,29 @@ jobs:
           echo "Downloaded boss-plugin-api v${API_VERSION}"
           ls -la build/downloaded-deps/
 
-      - name: Build plugin
-        run: ./gradlew build
+      - name: Install test runtime dependencies
+        if: inputs.test_apt_packages != '' || inputs.test_xvfb
         env:
+          TEST_APT_PACKAGES: ${{ inputs.test_apt_packages }}
+          TEST_XVFB: ${{ inputs.test_xvfb }}
+        run: |
+          set -euo pipefail
+          read -r -a packages <<< "$TEST_APT_PACKAGES"
+          if [[ "$TEST_XVFB" == "true" ]]; then
+            packages+=(xvfb xauth)
+          fi
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq -- "${packages[@]}"
+
+      - name: Build plugin
+        run: |
+          if [[ "$TEST_XVFB" == "true" ]]; then
+            xvfb-run -a ./gradlew build
+          else
+            ./gradlew build
+          fi
+        env:
+          TEST_XVFB: ${{ inputs.test_xvfb }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
       - name: Extract version
